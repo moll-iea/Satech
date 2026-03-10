@@ -1,0 +1,93 @@
+.nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 60px;
+  background: rgba(10,10,10,0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(245,197,24,0.1);
+  transition: padding 0.3s, background 0.3s;
+}
+
+.scrolled {
+  padding: 14px 60px;
+  background: rgba(10,10,10,0.97);
+  border-bottom-color: rgba(245,197,24,0.2);
+}
+
+.logo {
+  font-family: var(--font-display);
+  font-size: 26px;
+  letter-spacing: 3px;
+  color: var(--gold);
+  user-select: none;
+}
+.logo span { color: var(--white); }
+
+.links {
+  display: flex; gap: 36px; list-style: none; align-items: center;
+}
+.links a {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(240,237,230,0.55);
+  text-decoration: none;
+  transition: color 0.25s;
+}
+.links a:hover { color: var(--gold); }
+
+.cta {
+  background: var(--gold) !important;
+  color: var(--black) !important;
+  padding: 10px 22px !important;
+  font-weight: 700 !important;
+  transition: background 0.25s !important;
+}
+.cta:hover { background: var(--gold-dark) !important; }
+
+/* Hamburger */
+.hamburger {
+  display: none;
+  flex-direction: column; gap: 5px;
+  background: none; border: none; cursor: pointer; padding: 4px;
+}
+.hamburger span {
+  display: block; width: 24px; height: 2px;
+  background: var(--light);
+  transition: all 0.3s;
+}
+.barOpen:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.barOpen:nth-child(2) { opacity: 0; }
+.barOpen:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* Drawer */
+.drawer {
+  position: fixed; top: 60px; left: 0; right: 0;
+  background: var(--dark2);
+  padding: 24px 24px 32px;
+  display: flex; flex-direction: column; gap: 20px;
+  border-bottom: 2px solid var(--gold);
+}
+.drawer a {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(240,237,230,0.7);
+  text-decoration: none;
+}
+.drawerCta {
+  background: var(--gold);
+  color: var(--black) !important;
+  padding: 14px 20px;
+  font-weight: 700 !important;
+  text-align: center;
+}
+
+@media (max-width: 900px) {
+  .nav { padding: 16px 24px; }
+  .scrolled { padding: 12px 24px; }
+  .links { display: none; }
+  .hamburger { display: flex; }
+}

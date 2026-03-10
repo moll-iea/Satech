@@ -1,0 +1,58 @@
+.clients { background: var(--black); padding: 120px 60px; }
+
+.header { margin-bottom: 60px; }
+
+.sub {
+  font-size: 15px;
+  color: rgba(240,237,230,0.5);
+  max-width: 500px;
+  line-height: 1.8;
+}
+
+.marqueeWrap {
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.track {
+  display: flex;
+  gap: 12px;
+  animation: marquee 25s linear infinite;
+  white-space: nowrap;
+}
+
+.reverse {
+  animation: marquee 30s linear infinite reverse;
+}
+
+.badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: rgba(240,237,230,0.25);
+  white-space: nowrap;
+  padding: 10px 22px;
+  border: 1px solid rgba(240,237,230,0.08);
+  cursor: default;
+  transition: color 0.3s, border-color 0.3s;
+  flex-shrink: 0;
+}
+.badge:hover {
+  color: var(--gold);
+  border-color: rgba(245,197,24,0.35);
+}
+
+/* Add this keyframes animation */
+@keyframes marquee {
+  from { 
+    transform: translateX(0); 
+  }
+  to { 
+    transform: translateX(-50%); 
+  }
+}
+
+@media (max-width: 900px) {
+  .clients { padding: 80px 24px; }
+}

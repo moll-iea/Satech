@@ -1,0 +1,36 @@
+.bar {
+  background: var(--gold);
+  padding: 14px 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.inner {
+  display: inline-flex;
+  animation: marquee 30s linear infinite;
+}
+
+.item {
+  font-family: var(--font-display);
+  font-size: 18px;
+  letter-spacing: 3px;
+  color: var(--black);
+  padding: 0 40px;
+}
+
+.dot {
+  color: var(--accent);
+  padding: 0 10px;
+  font-size: 14px;
+  align-self: center;
+}
+
+/* Add this keyframes animation */
+@keyframes marquee {
+  from { 
+    transform: translateX(0); 
+  }
+  to { 
+    transform: translateX(-50%); 
+  }
+}
