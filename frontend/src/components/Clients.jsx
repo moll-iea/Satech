@@ -1,35 +1,46 @@
 import React from "react";
-import { CLIENTS_ROW1, CLIENTS_ROW2 } from "../data/siteData";
 import styles from "./Clients.module.css";
 
-function ClientsTrack({ clients, reverse = false }) {
-  const doubled = [...clients, ...clients];
+const EXHIBITIONS_ROW1 = ["Medical", "Aerospace", "Metal", "Productronica", "Apex"];
+const EXHIBITIONS_ROW2 = ["Nepcon", "Semi.org", "Semicon", "Medical", "Aerospace"];
+
+function ExhibitionsTrack({ exhibitions, reverse = false }) {
   return (
     <div className={styles.marqueeWrap}>
       <div className={`${styles.track} ${reverse ? styles.reverse : ""}`}>
-        {doubled.map((c, i) => (
-          <span className={styles.badge} key={i}>{c}</span>
-        ))}
+        {/* group 1 */}
+        <div className={styles.group}>
+          {exhibitions.map((e, i) => (
+            <span className={styles.badge} key={`a-${i}`}>{e}</span>
+          ))}
+        </div>
+
+        {/* group 2 (duplicate for seamless loop) */}
+        <div className={styles.group} aria-hidden="true">
+          {exhibitions.map((e, i) => (
+            <span className={styles.badge} key={`b-${i}`}>{e}</span>
+          ))}
+        </div>
       </div>
     </div>
   );
 }
 
-export default function Clients() {
+export default function Exhibitions() {
   return (
-    <section className={styles.clients} id="clients">
+    <section className={styles.clients} id="exhibitions">
       <div className={styles.header}>
-        <div className="section-tag">// Global Clientele</div>
-        <h2 className="section-title">Trusted By<br />Industry Leaders</h2>
+        <div className="section-tag">// Exhibitions</div>
+        <h2 className="section-title">Featured In<br />Top Industry Events</h2>
         <div className="divider" />
         <p className={styles.sub}>
-          From global semiconductor giants to local manufacturers — our client
-          portfolio spans the world's most respected brands in technology and industry.
+          From global semiconductor summits to specialized manufacturing expos — our
+          presence spans the world's most respected exhibitions in technology and industry.
         </p>
       </div>
 
-      <ClientsTrack clients={CLIENTS_ROW1} />
-      <ClientsTrack clients={CLIENTS_ROW2} reverse />
+      <ExhibitionsTrack exhibitions={EXHIBITIONS_ROW1} />
+      <ExhibitionsTrack exhibitions={EXHIBITIONS_ROW2} reverse />
     </section>
   );
 }

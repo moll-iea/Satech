@@ -14,7 +14,7 @@ export default function About() {
         <h2 className="section-title">We Create<br />Values</h2>
         <div className="divider" />
         <p className="reveal">
-          SA TECH INC. is a solutions provider with more than 30 years of
+          SATECH is a solutions provider with more than 30 years of
           experience in the SMT and Semiconductor business worldwide. We connect
           suppliers and end-users across Electronics, Semiconductors, Medical,
           Automotive, Pharmaceutical, Food, and Machine Industries.
@@ -33,7 +33,11 @@ export default function About() {
           <div className={styles.boxTitle}>Core Values</div>
           <div className={styles.valuesGrid}>
             {VALUES.map((v) => (
-              <div className={`${styles.valueItem} reveal`} key={v.name}>
+              <div
+                className={`${styles.valueItem} reveal`}
+                key={v.name}
+                data-icon={v.icon}
+              >
                 <div className={styles.valueIcon}>{v.icon}</div>
                 <div>
                   <div className={styles.valueName}>{v.name}</div>

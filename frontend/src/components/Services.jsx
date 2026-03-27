@@ -16,7 +16,7 @@ export default function Services() {
         </div>
         <p className={styles.introText}>
           From equipment supply and technical support to factory automation and
-          legal services — SA TECH INC. delivers comprehensive solutions that
+          legal services — SATECH delivers comprehensive solutions that
           drive value across your entire operation.
         </p>
       </div>

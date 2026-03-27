@@ -15,14 +15,24 @@
 }
 
 .track {
+  --gap: 12px;
   display: flex;
-  gap: 12px;
-  animation: marquee 25s linear infinite;
+  gap: var(--gap);
+  width: max-content;
   white-space: nowrap;
+  will-change: transform;
+  animation: marqueeLeft 25s linear infinite;
 }
 
 .reverse {
-  animation: marquee 30s linear infinite reverse;
+  /* move from the opposite end */
+  animation: marqueeRight 25s linear infinite;
+}
+
+.group {
+  display: flex;
+  gap: var(--gap);
+  flex-shrink: 0;
 }
 
 .badge {
@@ -43,14 +53,14 @@
   border-color: rgba(245,197,24,0.35);
 }
 
-/* Add this keyframes animation */
-@keyframes marquee {
-  from { 
-    transform: translateX(0); 
-  }
-  to { 
-    transform: translateX(-50%); 
-  }
+@keyframes marqueeLeft {
+  from { transform: translateX(0); }
+  to   { transform: translateX(calc(-50% - (var(--gap) / 2))); }
+}
+
+@keyframes marqueeRight {
+  from { transform: translateX(calc(-50% - (var(--gap) / 2))); }
+  to   { transform: translateX(0); }
 }
 
 @media (max-width: 900px) {

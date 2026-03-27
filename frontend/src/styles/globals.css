@@ -5,15 +5,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
 
 :root {
-  --gold:      #F5C518;
-  --gold-dark: #C9A000;
-  --black:     #0A0A0A;
-  --dark:      #111111;
-  --dark2:     #1A1A1A;
-  --gray:      #2A2A2A;
-  --light:     #F0EDE6;
-  --white:     #FFFFFF;
-  --accent:    #FF6B00;
+  /* Main brand colors */
+  --black: #283176;  /* navy */
+  --dark:  #244780;   /* deep navy */
+  --dark2: #00004d;   /* darker navy for cards/panels */
+  --gold:  #ffcc00;   /* gold */
+  --silver: #c0c0c0;   /* silver */
+  --light: #f0ede6;   /* off-white for text */
+
+  /* optional supporting tones */
+  --accent:  #3b8bd4; 
+  --accent2: #8fc5ff;
 
   --font-display: 'Bebas Neue', sans-serif;
   --font-body:    'DM Sans', sans-serif;

@@ -7,7 +7,7 @@ export const NAV_LINKS = [
   { label: "Services", href: "#services" },
   { label: "Products", href: "#products" },
   { label: "Clients",  href: "#clients" },
-  { label: "Global",   href: "#global" },
+  { label: "News",     href: "#news" },
 ];
 
 export const HERO_STATS = [
@@ -59,7 +59,7 @@ export const SERVICES = [
   },
   {
     num: "06", icon: "📊", cat: "Business",
-    title: "Tax, Legal & HR Services",
+    title: "Legal & HR Services",
     desc: "Full-suite advisory: accounting, legal & actuarial, HR management, transportation, and facilities services.",
   },
 ];
@@ -116,17 +116,6 @@ export const PRODUCTS = {
   ],
 };
 
-export const CLIENTS_ROW1 = [
-  "Texas Instruments","Infineon","Qualcomm","Broadcom","Intel Philippines",
-  "ON Semiconductor","STMicroelectronics","Toshiba","Amkor Technology",
-  "Bosch","Nexperia","Analog Devices","Microchip","Fairchild","Freescale",
-];
-
-export const CLIENTS_ROW2 = [
-  "Samsung Electronics","Fujitsu","Honda","Toyota","Pfizer","Panasonic",
-  "Western Digital","Seagate","Hitachi","TDK","Sanyo","Xilinx","Vishay",
-  "Lattice","Emerson","Moog","Nestlé","Ford","Olympus","Continental",
-];
 
 export const LOCATIONS = [
   "Fremont, USA", "Chicago, USA", "Tijuana, Mexico", "Mexicali, Mexico",
@@ -136,7 +125,37 @@ export const LOCATIONS = [
 ];
 
 export const CONTACT_INFO = [
-  { icon: "📍", label: "Address",  value: "10th Floor Common Goal Tower, Finance St. cor. Industry St., Madrigal Business Park, Muntinlupa City, Philippines 1770" },
-  { icon: "📞", label: "Phone",    value: "+632.8.850.1505" },
-  { icon: "🌐", label: "Website",  value: "www.satech8.com" },
+  { icon: "📍", label: "Address",  value: "Northgate, Muntinlupa City, Philippines" },
+
+];
+
+export const NEWS_ARTICLES = [
+  {
+    title: "SA TECH Showcases Advanced SMT Inspection Solutions",
+    category: "Exhibition",
+    date: "2026-02-12",
+    summary: "Highlighted SPI/AOI capabilities for high-precision electronics manufacturing.",
+    link: "#",
+  },
+  {
+    title: "New Partnership Expands Automation Support in Southeast Asia",
+    category: "Partnership",
+    date: "2026-01-28",
+    summary: "Regional collaboration to accelerate deployment and service response.",
+    link: "#",
+  },
+  {
+    title: "Preventive Maintenance Program Reduces Downtime by 30%",
+    category: "Case Study",
+    date: "2025-12-10",
+    summary: "Customer success story across multi-line semiconductor operations.",
+    link: "#",
+  },
+  {
+    title: "SA TECH Engineers Complete Overseas Factory Certification",
+    category: "Company",
+    date: "2025-11-05",
+    summary: "Factory-trained specialists now certified for additional platforms.",
+    link: "#",
+  },
 ];

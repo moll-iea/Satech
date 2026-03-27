@@ -1,20 +1,21 @@
 import React from "react";
 import { HERO_STATS } from "../data/siteData";
+import PCBBackground from "./PCBBackground";
 import styles from "./Hero.module.css";
 
 export default function Hero() {
   return (
     <section className={styles.hero} id="hero">
-      <div className={styles.bg} />
-      <div className={styles.grid} />
+      {/* Animated PCB canvas — replaces static .bg and .grid divs */}
+      <PCBBackground />
 
       <div className={styles.tag}>
         📍 Muntinlupa City, Philippines · Est. 30+ Years
       </div>
 
       <h1 className={styles.title}>
-        SA<br />
-        <span className={styles.stroke}>TECH</span>
+        {/* SATECH<br /> */}
+        <span className={styles.stroke}>SATECH</span>
       </h1>
 
       <p className={styles.sub}>The Solutions Provider</p>

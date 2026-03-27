@@ -1,5 +1,5 @@
 import React from "react";
-import { LOCATIONS } from "../data/siteData";
+import { NEWS_ARTICLES } from "../data/siteData";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 import styles from "./Global.module.css";
 
@@ -7,32 +7,30 @@ export default function Global() {
   const ref = useScrollReveal();
 
   return (
-    <section className={styles.global} id="global" ref={ref}>
+    <section className={styles.global} id="news" ref={ref}>
       <div className={styles.left}>
-        <div className="section-tag">// Our Reach</div>
-        <h2 className="section-title">Global<br />Presence</h2>
+        <div className="section-tag">// News & Articles</div>
+        <h2 className="section-title">Latest<br />Updates</h2>
         <div className="divider" />
         <p className={styles.desc}>
-          SA TECH has provided technical support across multiple continents —
-          from Southeast Asia and the Americas to Europe and the Middle East.
+          Read the latest SA TECH announcements, event highlights, and industry insights.
         </p>
-        <div className={styles.locGrid}>
-          {LOCATIONS.map((loc) => (
-            <div className={`${styles.locItem} reveal`} key={loc}>
-              <span className={styles.dot} />
-              <span className={styles.locName}>{loc}</span>
-            </div>
-          ))}
-        </div>
       </div>
 
       <div className={styles.right}>
-        <div className={styles.mapBox}>
-          <div className={styles.mapGrid} />
-          <div className={styles.mapContent}>
-            <span className={styles.globeEmoji}>🌏</span>
-            <p className={styles.mapText}>WORLDWIDE<br />TECHNICAL SUPPORT</p>
-          </div>
+        <div className={styles.locGrid}>
+          {NEWS_ARTICLES.map((item) => (
+            <a
+              key={`${item.title}-${item.date}`}
+              href={item.link}
+              className={`${styles.locItem} reveal`}
+            >
+              <span className={styles.dot} />
+              <span className={styles.locName}>
+                [{item.category}] {item.title} — {item.date}
+              </span>
+            </a>
+          ))}
         </div>
       </div>
     </section>
