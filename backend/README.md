@@ -10,7 +10,22 @@ npm install
 ```
 
 2. Configure environment variables:
-   - Copy `.env` file and update with your MongoDB URI and JWT secret
+   - Create `backend/.env` using `backend/.env.example`
+   - Set `MONGODB_URI` to your MongoDB Atlas connection string
+   - Replace `<db_password>` with your real database user password
+   - Set a strong `JWT_SECRET`
+   - Set Gmail SMTP values (`SMTP_USER`, `SMTP_PASS`, and `CONTACT_RECEIVER_EMAIL`)
+
+### Gmail Contact Delivery Setup
+
+1. Enable 2-Step Verification on the Gmail account you will use to send mail.
+2. Generate a Google App Password (16 characters) for Mail.
+3. Put these in `backend/.env`:
+   - `SMTP_USER` = sender Gmail address
+   - `SMTP_PASS` = Google App Password (not your normal Gmail password)
+   - `CONTACT_RECEIVER_EMAIL` = destination inbox for contact submissions
+
+Contact form submissions are stored in MongoDB and then forwarded to `CONTACT_RECEIVER_EMAIL`.
 
 3. Start the server:
 ```bash

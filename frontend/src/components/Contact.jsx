@@ -8,6 +8,8 @@ export default function Contact() {
   const [form, setForm]       = useState(INITIAL);
   const [errors, setErrors]   = useState({});
   const [submitted, setSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const validate = () => {
     const e = {};
@@ -21,14 +23,40 @@ export default function Contact() {
   const handleChange = (e) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
     setErrors((prev) => ({ ...prev, [e.target.name]: undefined }));
+    setSubmitError("");
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const errs = validate();
     if (Object.keys(errs).length) { setErrors(errs); return; }
-    setSubmitted(true);
-    setForm(INITIAL);
+
+    try {
+      setIsSubmitting(true);
+      setSubmitError("");
+
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+      const res = await fetch(`${baseUrl}/api/contact`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to send message.");
+      }
+
+      setSubmitted(true);
+      setForm(INITIAL);
+    } catch (error) {
+      setSubmitError(error.message || "Failed to send message.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -69,6 +97,7 @@ export default function Contact() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} noValidate>
+              {submitError && <p className={styles.error}>{submitError}</p>}
               {[
                 { name: "name",    type: "text",  placeholder: "Your Full Name" },
                 { name: "email",   type: "email", placeholder: "Email Address" },
@@ -100,8 +129,8 @@ export default function Contact() {
                   <span className={styles.error}>{errors.message}</span>
                 )}
               </div>
-              <button type="submit" className={styles.btnDark}>
-                Send Message →
+              <button type="submit" className={styles.btnDark} disabled={isSubmitting}>
+                {isSubmitting ? "Sending..." : "Send Message →"}
               </button>
             </form>
           )}
