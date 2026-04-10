@@ -4,11 +4,28 @@ const requiredEnv = ['SMTP_USER', 'SMTP_PASS', 'CONTACT_RECEIVER_EMAIL'];
 
 const getMissingEnv = () => requiredEnv.filter((key) => !process.env[key]);
 
+const normalizeEmailValue = (value) => {
+    return String(value || '').trim();
+};
+
+const normalizeAppPassword = (value) => {
+    return String(value || '').replace(/\s+/g, '').trim();
+};
+
+const smtpUser = normalizeEmailValue(process.env.SMTP_USER);
+const smtpPass = normalizeAppPassword(process.env.SMTP_PASS);
+const receiverEmail = normalizeEmailValue(process.env.CONTACT_RECEIVER_EMAIL);
+
 const transporter = nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    tls: {
+        rejectUnauthorized: false
+    },
     auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS
+        user: smtpUser,
+        pass: smtpPass
     }
 });
 
@@ -16,6 +33,10 @@ const sendContactEmail = async ({ name, email, company, message, createdAt }) =>
     const missing = getMissingEnv();
     if (missing.length) {
         throw new Error(`Missing email config: ${missing.join(', ')}`);
+    }
+
+    if (!smtpUser || !smtpPass || !receiverEmail) {
+        throw new Error('SMTP configuration is incomplete or invalid.');
     }
 
     const subject = `New Contact Inquiry from ${name}`;
@@ -42,8 +63,8 @@ const sendContactEmail = async ({ name, email, company, message, createdAt }) =>
     `;
 
     await transporter.sendMail({
-        from: `Satech Contact Form <${process.env.SMTP_USER}>`,
-        to: process.env.CONTACT_RECEIVER_EMAIL,
+        from: `Satech Contact Form <${smtpUser}>`,
+        to: receiverEmail,
         replyTo: email,
         subject,
         text: textBody,
