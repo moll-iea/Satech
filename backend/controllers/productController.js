@@ -1,26 +1,35 @@
 const Product = require('../models/Product');
 const Category = require('../models/Category');
-const fs = require('fs');
-const path = require('path');
+const cloudinary = require('../config/cloudinary');
 
-const toPublicImagePath = (file) => {
-    if (!file) {
-        return '';
-    }
+const uploadToCloudinary = (fileBuffer, filename, folder = 'satech/products') => {
+    return new Promise((resolve, reject) => {
+        const uploadStream = cloudinary.uploader.upload_stream(
+            {
+                folder,
+                public_id: `${Date.now()}-${filename}`,
+                resource_type: 'image'
+            },
+            (error, result) => {
+                if (error) {
+                    reject(error);
+                    return;
+                }
 
-    return `/uploads/products/${file.filename}`;
+                resolve(result);
+            }
+        );
+
+        uploadStream.end(fileBuffer);
+    });
 };
 
-const removeLocalImage = (imagePath) => {
-    if (!imagePath || !imagePath.startsWith('/uploads/products/')) {
+const deleteFromCloudinary = async (publicId) => {
+    if (!publicId) {
         return;
     }
 
-    const fullPath = path.join(__dirname, '..', imagePath.replace(/^\//, ''));
-
-    if (fs.existsSync(fullPath)) {
-        fs.unlinkSync(fullPath);
-    }
+    await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
 };
 
 exports.getProducts = async (req, res) => {
@@ -46,12 +55,24 @@ exports.getProducts = async (req, res) => {
 exports.createProduct = async (req, res) => {
     try {
         const { name, detail, categoryId } = req.body;
-        const image = toPublicImagePath(req.file);
-
-        if (!name || !detail || !categoryId || !image) {
+        if (!req.file) {
             return res.status(400).json({
                 success: false,
-                message: 'Name, detail, category, and image file are required.'
+                message: 'Product image file is required.'
+            });
+        }
+
+        if (!name || !detail || !categoryId) {
+            return res.status(400).json({
+                success: false,
+                message: 'Name, detail, and category are required.'
+            });
+        }
+
+        if (!cloudinary.isConfigured) {
+            return res.status(500).json({
+                success: false,
+                message: 'Cloudinary is not configured on the server. Restart the backend after setting CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.'
             });
         }
 
@@ -63,12 +84,15 @@ exports.createProduct = async (req, res) => {
             });
         }
 
+        const uploadedImage = await uploadToCloudinary(req.file.buffer, req.file.originalname);
+
         const product = await Product.create({
             name: name.trim(),
             detail: detail.trim(),
             category: category.name,
             categoryId: category._id,
-            image
+            image: uploadedImage.secure_url,
+            imagePublicId: uploadedImage.public_id
         });
 
         return res.status(201).json({
@@ -77,9 +101,10 @@ exports.createProduct = async (req, res) => {
             data: product
         });
     } catch (error) {
+        console.error('Create product error:', error);
         return res.status(500).json({
             success: false,
-            message: 'Error creating product',
+            message: error.message || 'Error creating product',
             error: error.message
         });
     }
@@ -122,8 +147,17 @@ exports.updateProduct = async (req, res) => {
         }
 
         if (req.file) {
-            removeLocalImage(existingProduct.image);
-            updates.image = toPublicImagePath(req.file);
+            if (!cloudinary.isConfigured) {
+                return res.status(500).json({
+                    success: false,
+                    message: 'Cloudinary is not configured on the server. Restart the backend after setting CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, and CLOUDINARY_API_SECRET.'
+                });
+            }
+
+            const uploadedImage = await uploadToCloudinary(req.file.buffer, req.file.originalname);
+            await deleteFromCloudinary(existingProduct.imagePublicId);
+            updates.image = uploadedImage.secure_url;
+            updates.imagePublicId = uploadedImage.public_id;
         }
 
         updates.updatedAt = Date.now();
@@ -143,9 +177,10 @@ exports.updateProduct = async (req, res) => {
             data: product
         });
     } catch (error) {
+        console.error('Update product error:', error);
         return res.status(500).json({
             success: false,
-            message: 'Error updating product',
+            message: error.message || 'Error updating product',
             error: error.message
         });
     }
@@ -162,16 +197,17 @@ exports.deleteProduct = async (req, res) => {
             });
         }
 
-        removeLocalImage(product.image);
+        await deleteFromCloudinary(product.imagePublicId);
 
         return res.status(200).json({
             success: true,
             message: 'Product deleted successfully'
         });
     } catch (error) {
+        console.error('Delete product error:', error);
         return res.status(500).json({
             success: false,
-            message: 'Error deleting product',
+            message: error.message || 'Error deleting product',
             error: error.message
         });
     }

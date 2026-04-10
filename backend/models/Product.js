@@ -26,6 +26,10 @@ const productSchema = new mongoose.Schema({
         required: [true, 'Please provide a product image URL'],
         trim: true
     },
+    imagePublicId: {
+        type: String,
+        default: ''
+    },
     createdAt: {
         type: Date,
         default: Date.now
