@@ -9,9 +9,8 @@ export function useScrollReveal(threshold = 0.12) {
   const containerRef = useRef(null);
 
   useEffect(() => {
-    const elements = containerRef.current
-      ? containerRef.current.querySelectorAll(".reveal")
-      : document.querySelectorAll(".reveal");
+    const root = containerRef.current || document;
+    const observedElements = new WeakSet();
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -25,8 +24,37 @@ export function useScrollReveal(threshold = 0.12) {
       { threshold }
     );
 
-    elements.forEach((el) => observer.observe(el));
-    return () => observer.disconnect();
+    const observeElements = () => {
+      root.querySelectorAll(".reveal").forEach((el) => {
+        if (!observedElements.has(el)) {
+          observedElements.add(el);
+          observer.observe(el);
+        }
+      });
+    };
+
+    observeElements();
+
+    const mutationObserver = new MutationObserver(() => {
+      observeElements();
+    });
+
+    if (containerRef.current) {
+      mutationObserver.observe(containerRef.current, {
+        childList: true,
+        subtree: true,
+      });
+    } else {
+      mutationObserver.observe(document.body, {
+        childList: true,
+        subtree: true,
+      });
+    }
+
+    return () => {
+      observer.disconnect();
+      mutationObserver.disconnect();
+    };
   }, [threshold]);
 
   return containerRef;

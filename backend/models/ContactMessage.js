@@ -26,6 +26,8 @@ const contactMessageSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     }
+}, {
+    collection: 'messages'
 });
 
 module.exports = mongoose.model('ContactMessage', contactMessageSchema);

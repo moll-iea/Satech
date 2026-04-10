@@ -1,0 +1,82 @@
+.page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+  background:
+    radial-gradient(1200px 600px at 5% 10%, #ffd9a8 0%, transparent 55%),
+    radial-gradient(1000px 500px at 95% 90%, #b6e2ff 0%, transparent 55%),
+    #f6f7f2;
+}
+
+.card {
+  width: min(460px, 100%);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #cfd3c4;
+  border-radius: 18px;
+  padding: 2rem;
+  box-shadow: 0 20px 45px rgba(20, 34, 28, 0.14);
+}
+
+.tag {
+  margin: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: #3f5a4f;
+}
+
+.title {
+  margin: 0.4rem 0 0;
+  font-size: 2rem;
+  color: #18261f;
+}
+
+.subtitle {
+  margin: 0.55rem 0 1.4rem;
+  color: #43594f;
+}
+
+.form {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #203329;
+}
+
+.input {
+  border: 1px solid #b8c1b3;
+  border-radius: 10px;
+  padding: 0.72rem 0.85rem;
+  font-size: 0.95rem;
+}
+
+.input:focus {
+  outline: 2px solid #4f7b67;
+  outline-offset: 1px;
+}
+
+.error {
+  margin: 0.2rem 0 0;
+  color: #a12424;
+  font-size: 0.9rem;
+}
+
+.button {
+  margin-top: 0.55rem;
+  border: 0;
+  border-radius: 12px;
+  padding: 0.8rem 1rem;
+  font-weight: 700;
+  background: #1f4433;
+  color: #fff;
+  cursor: pointer;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
