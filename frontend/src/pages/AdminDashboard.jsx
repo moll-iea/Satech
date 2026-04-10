@@ -50,6 +50,12 @@ export default function AdminDashboard() {
 
   const navigate = useNavigate();
 
+  const stats = useMemo(() => [
+    { label: "Categories", value: categories.length },
+    { label: "Products", value: products.length },
+    { label: "Inquiries", value: messages.length },
+  ], [categories.length, products.length, messages.length]);
+
   useEffect(() => {
     if (!imageFile) {
       setImagePreview("");
@@ -401,14 +407,27 @@ export default function AdminDashboard() {
         <div>
           <p className={styles.tag}>SATECH ADMIN</p>
           <h1 className={styles.title}>Categories, Products, and Inquiries</h1>
+          <p className={styles.subtitle}>Manage the content that appears on the public website from one place.</p>
         </div>
         <button className={styles.logout} onClick={handleLogout}>Logout</button>
       </header>
+
+      {!isLoading && !error && (
+        <section className={styles.overviewGrid}>
+          {stats.map((stat) => (
+            <article className={styles.overviewCard} key={stat.label}>
+              <span>{stat.label}</span>
+              <strong>{stat.value}</strong>
+            </article>
+          ))}
+        </section>
+      )}
 
       {isLoading && <p className={styles.state}>Loading admin data...</p>}
       {!isLoading && error && <p className={styles.error}>{error}</p>}
 
       {!isLoading && !error && (
+        <div className={styles.managementGrid}>
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Category Management</h2>
 
@@ -457,9 +476,7 @@ export default function AdminDashboard() {
             {categories.length === 0 && <p className={styles.state}>No categories yet. Create one first.</p>}
           </div>
         </section>
-      )}
 
-      {!isLoading && !error && (
         <section className={styles.section}>
           <h2 className={styles.sectionTitle}>Product Management</h2>
 
@@ -547,6 +564,7 @@ export default function AdminDashboard() {
             {products.length === 0 && <p className={styles.state}>No products yet. Add your first product above.</p>}
           </div>
         </section>
+        </div>
       )}
 
       {!isLoading && !error && (
