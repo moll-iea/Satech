@@ -1,12 +1,14 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+
+// Load environment variables FIRST
+dotenv.config();
+
 const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const contactRoutes = require('./routes/contactRoutes');
-
-// Load environment variables
-dotenv.config();
+const newsRoutes = require('./routes/newsRoutes');
 
 const app = express();
 
@@ -26,6 +28,7 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/news', newsRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
