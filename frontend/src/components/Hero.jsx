@@ -18,7 +18,7 @@ export default function Hero() {
         <span className={styles.stroke}>SATECH</span>
       </h1>
 
-      <p className={styles.sub}>The Solutions Provider</p>
+      {/* <p className={styles.sub}>The Solutions Provider</p> */}
 
       <p className={styles.desc}>
         Providing the manufacturing industry with technologically advanced
