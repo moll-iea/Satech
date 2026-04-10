@@ -1,7 +1,9 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const connectDB = require('./config/db');
+const userRoutes = require('./routes/userRoutes');
+const contactRoutes = require('./routes/contactRoutes');
 
 // Load environment variables
 dotenv.config();
@@ -14,21 +16,16 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/satech', {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-})
-.then(() => console.log('MongoDB connected successfully'))
-.catch((err) => console.error('MongoDB connection error:', err));
+connectDB();
 
 // Basic route
 app.get('/', (req, res) => {
     res.json({ message: 'Welcome to Satech API' });
 });
 
-// Import routes here
-// Example: const userRoutes = require('./routes/userRoutes');
-// app.use('/api/users', userRoutes);
+// Routes
+app.use('/api/users', userRoutes);
+app.use('/api/contact', contactRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

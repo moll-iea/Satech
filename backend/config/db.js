@@ -2,10 +2,17 @@ const mongoose = require('mongoose');
 
 const connectDB = async () => {
     try {
-        const conn = await mongoose.connect(process.env.MONGODB_URI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        });
+        const mongoUri = process.env.MONGODB_URI;
+
+        if (!mongoUri) {
+            throw new Error('MONGODB_URI is missing. Add it to backend/.env');
+        }
+
+        if (mongoUri.includes('<db_password>')) {
+            throw new Error('Replace <db_password> in MONGODB_URI with your real MongoDB password.');
+        }
+
+        const conn = await mongoose.connect(mongoUri);
         
         console.log(`MongoDB Connected: ${conn.connection.host}`);
     } catch (error) {
