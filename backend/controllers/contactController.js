@@ -64,3 +64,21 @@ exports.createContactMessage = async (req, res) => {
         });
     }
 };
+
+exports.getContactMessages = async (req, res) => {
+    try {
+        const messages = await ContactMessage.find().sort({ createdAt: -1 });
+
+        return res.status(200).json({
+            success: true,
+            count: messages.length,
+            data: messages
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Error fetching contact messages',
+            error: error.message
+        });
+    }
+};

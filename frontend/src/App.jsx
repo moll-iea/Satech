@@ -1,30 +1,18 @@
 import React from "react";
 import "./styles/globals.css";
+import { Navigate, Route, Routes } from "react-router-dom";
 
-import Navbar     from "./components/Navbar";
-import Hero       from "./components/Hero";
-import MarqueeBar from "./components/MarqueeBar";
-import About      from "./components/About";
-import Services   from "./components/Services";
-import Products   from "./components/Products";
-import Clients    from "./components/Clients";
-import Global     from "./components/Global";
-import Contact    from "./components/Contact";
-import Footer     from "./components/Footer";
+import HomePage from "./pages/HomePage";
+import AdminLogin from "./pages/AdminLogin";
+import AdminDashboard from "./pages/AdminDashboard";
 
 export default function App() {
   return (
-    <>
-      <Navbar />
-      <Hero />
-      <MarqueeBar />
-      <About />
-      <Services />
-      <Products />
-      <Clients />
-      <Global />
-      <Contact />
-      <Footer />
-    </>
+    <Routes>
+      <Route path="/" element={<HomePage />} />
+      <Route path="/admin/login" element={<AdminLogin />} />
+      <Route path="/admin" element={<AdminDashboard />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }

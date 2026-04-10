@@ -39,11 +39,24 @@ npm start
 ## API Endpoints
 
 ### Users
-- `GET /api/users` - Get all users
-- `GET /api/users/:id` - Get user by ID
-- `POST /api/users` - Create new user
-- `PUT /api/users/:id` - Update user
-- `DELETE /api/users/:id` - Delete user
+- `POST /api/users/admin/bootstrap` - Create first admin only (requires `x-admin-setup-key` header matching `ADMIN_SETUP_KEY`)
+- `POST /api/users/admin/login` - Admin login and JWT token issuance
+- `GET /api/users/admin/me` - Get logged-in admin profile (admin token required)
+- `GET /api/users` - Get all users (admin only)
+- `GET /api/users/:id` - Get user by ID (admin only)
+- `POST /api/users` - Create new user (admin only)
+- `PUT /api/users/:id` - Update user (admin only)
+- `DELETE /api/users/:id` - Delete user (admin only)
+
+### Contact
+- `POST /api/contact` - Create inquiry message from website contact form
+- `GET /api/contact/messages` - List inquiry messages (admin only)
+
+### Products
+- `GET /api/products` - List products for website display
+- `POST /api/products` - Create product (admin only)
+- `PUT /api/products/:id` - Update product (admin only)
+- `DELETE /api/products/:id` - Delete product (admin only)
 
 ## Project Structure
 
