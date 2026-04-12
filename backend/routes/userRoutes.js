@@ -6,7 +6,7 @@ const { protect, authorize } = require('../middleware/auth');
 router.post('/admin/login', userController.adminLogin);
 router.get('/admin/status', userController.getAdminSetupStatus);
 router.post('/admin/bootstrap', userController.bootstrapAdmin);
-router.post('/admin/register', protect, authorize('admin'), userController.registerAdmin);
+router.get('/admin/verify-email', userController.verifyAdminEmail);
 router.get('/admin/me', protect, authorize('admin'), userController.getAdminProfile);
 
 // User routes

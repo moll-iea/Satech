@@ -10,7 +10,6 @@ export default function AdminRegister() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isChecking, setIsChecking] = useState(true);
   const [hasAdmin, setHasAdmin] = useState(false);
@@ -47,7 +46,6 @@ export default function AdminRegister() {
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
-    setSuccess("");
 
     if (!name.trim() || !email.trim() || !password.trim()) {
       setError("Name, email, and password are required.");
@@ -93,11 +91,7 @@ export default function AdminRegister() {
         throw new Error(payload.message || "Failed to create admin account.");
       }
 
-      setSuccess(`${payload.data?.name || name.trim()} was created as an admin account.`);
-      setName("");
-      setEmail("");
-      setPassword("");
-      setConfirmPassword("");
+      navigate("/admin/login?checkEmail=1", { replace: true });
     } catch (err) {
       setError(err.message || "Failed to create admin account.");
     } finally {
@@ -160,8 +154,6 @@ export default function AdminRegister() {
           />
 
           {error && <p className={styles.error}>{error}</p>}
-          {success && <p className={styles.success}>{success}</p>}
-
           <button className={styles.button} type="submit" disabled={isLoading || isChecking}>
             {isLoading ? "Creating..." : "Create First Admin"}
           </button>

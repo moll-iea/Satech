@@ -1,18 +1,15 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const { sendAdminVerificationEmail } = require('../config/mailer');
 
 const normalizeEmail = (email) => email.trim().toLowerCase();
 
-const createAdminAccount = async ({ name, email, password, requireNoAdmins = false }) => {
-    if (requireNoAdmins) {
-        const existingAdmin = await User.findOne({ role: 'admin' });
-        if (existingAdmin) {
-            const error = new Error('Admin already exists. Use admin login.');
-            error.statusCode = 400;
-            throw error;
-        }
-    }
+const buildVerificationToken = () => crypto.randomBytes(32).toString('hex');
 
+const hashVerificationToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
+
+const createPendingAdminAccount = async ({ name, email, password, verificationUrlBase }) => {
     const existingUser = await User.findOne({ email: normalizeEmail(email) });
     if (existingUser) {
         const error = new Error('User with this email already exists.');
@@ -20,12 +17,35 @@ const createAdminAccount = async ({ name, email, password, requireNoAdmins = fal
         throw error;
     }
 
-    return User.create({
+    const admin = await User.create({
         name: name.trim(),
         email: normalizeEmail(email),
         password,
-        role: 'admin'
+        role: 'admin',
+        isEmailVerified: false
     });
+
+    const verificationToken = buildVerificationToken();
+    admin.emailVerificationToken = hashVerificationToken(verificationToken);
+    admin.emailVerificationExpires = Date.now() + 1000 * 60 * 60 * 24;
+    await admin.save({ validateBeforeSave: false });
+
+    const verificationUrl = `${verificationUrlBase}/api/users/admin/verify-email?token=${verificationToken}`;
+
+    try {
+        await sendAdminVerificationEmail({
+            name: admin.name,
+            email: admin.email,
+            verificationUrl
+        });
+    } catch (error) {
+        await User.findByIdAndDelete(admin._id);
+        const sendError = new Error(error.message || 'Failed to send verification email.');
+        sendError.statusCode = 500;
+        throw sendError;
+    }
+
+    return admin;
 };
 
 const getSignedToken = (user) => {
@@ -53,6 +73,13 @@ exports.adminLogin = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid admin credentials.'
+            });
+        }
+
+        if (!user.isEmailVerified) {
+            return res.status(403).json({
+                success: false,
+                message: 'Please verify your email before signing in.'
             });
         }
 
@@ -105,6 +132,38 @@ exports.getAdminSetupStatus = async (req, res) => {
     }
 };
 
+exports.verifyAdminEmail = async (req, res) => {
+    try {
+        const { token } = req.query;
+
+        if (!token) {
+            return res.status(400).send('Verification token is required.');
+        }
+
+        const hashedToken = hashVerificationToken(token);
+        const admin = await User.findOne({
+            role: 'admin',
+            emailVerificationToken: hashedToken,
+            emailVerificationExpires: { $gt: Date.now() }
+        });
+
+        if (!admin) {
+            return res.status(400).send('Verification link is invalid or has expired.');
+        }
+
+        admin.isEmailVerified = true;
+        admin.emailVerifiedAt = new Date();
+        admin.emailVerificationToken = undefined;
+        admin.emailVerificationExpires = undefined;
+        await admin.save({ validateBeforeSave: false });
+
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        return res.redirect(`${frontendUrl}/admin/login?verified=1`);
+    } catch (error) {
+        return res.status(500).send('Error verifying admin email.');
+    }
+};
+
 exports.getAdminProfile = async (req, res) => {
     try {
         return res.status(200).json({
@@ -154,48 +213,12 @@ exports.bootstrapAdmin = async (req, res) => {
             });
         }
 
-        const admin = await createAdminAccount({
+        const verificationBaseUrl = `${req.protocol}://${req.get('host')}`;
+        const admin = await createPendingAdminAccount({
             name,
             email,
             password,
-            requireNoAdmins: false
-        });
-
-        return res.status(201).json({
-            success: true,
-            message: 'Admin account created successfully.',
-            data: {
-                id: admin._id,
-                name: admin.name,
-                email: admin.email,
-                role: admin.role
-            }
-        });
-    } catch (error) {
-        const statusCode = error.statusCode || 500;
-        return res.status(statusCode).json({
-            success: false,
-            message: statusCode === 500 ? 'Error creating admin account' : error.message,
-            error: error.message
-        });
-    }
-};
-
-exports.registerAdmin = async (req, res) => {
-    try {
-        const { name, email, password } = req.body;
-
-        if (!name || !email || !password) {
-            return res.status(400).json({
-                success: false,
-                message: 'Name, email, and password are required.'
-            });
-        }
-
-        const admin = await createAdminAccount({
-            name,
-            email,
-            password
+            verificationUrlBase: verificationBaseUrl
         });
 
         return res.status(201).json({

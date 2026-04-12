@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import styles from "./AdminLogin.module.css";
 
@@ -9,9 +9,11 @@ export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [hasAdmin, setHasAdmin] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem(TOKEN_KEY);
@@ -40,9 +42,23 @@ export default function AdminLogin() {
     loadStatus();
   }, []);
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setMessage("");
+
+    if (params.get("verified") === "1") {
+      setMessage("Email verified successfully. You can sign in now.");
+    }
+
+    if (params.get("checkEmail") === "1") {
+      setMessage("Your admin account was created. Check your email to verify it before signing in.");
+    }
+  }, [location.search]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
+    setMessage("");
 
     if (!email.trim() || !password.trim()) {
       setError("Email and password are required.");
@@ -84,6 +100,7 @@ export default function AdminLogin() {
         <p className={styles.tag}>SATECH ADMIN</p>
         <h1 className={styles.title}>Sign in</h1>
         <p className={styles.subtitle}>Admin-only access panel for inquiry management.</p>
+        {message && <p className={styles.success}>{message}</p>}
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <label className={styles.label} htmlFor="admin-email">Email</label>

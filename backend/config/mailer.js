@@ -1,8 +1,9 @@
 const nodemailer = require('nodemailer');
 
-const requiredEnv = ['SMTP_USER', 'SMTP_PASS', 'CONTACT_RECEIVER_EMAIL'];
+const contactRequiredEnv = ['SMTP_USER', 'SMTP_PASS', 'CONTACT_RECEIVER_EMAIL'];
+const adminVerificationRequiredEnv = ['SMTP_USER', 'SMTP_PASS'];
 
-const getMissingEnv = () => requiredEnv.filter((key) => !process.env[key]);
+const getMissingEnv = (requiredEnv) => requiredEnv.filter((key) => !process.env[key]);
 
 const normalizeEmailValue = (value) => {
     return String(value || '').trim();
@@ -30,7 +31,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const sendContactEmail = async ({ name, email, company, message, createdAt }) => {
-    const missing = getMissingEnv();
+    const missing = getMissingEnv(contactRequiredEnv);
     if (missing.length) {
         throw new Error(`Missing email config: ${missing.join(', ')}`);
     }
@@ -72,4 +73,44 @@ const sendContactEmail = async ({ name, email, company, message, createdAt }) =>
     });
 };
 
-module.exports = { sendContactEmail };
+const sendAdminVerificationEmail = async ({ name, email, verificationUrl }) => {
+    const missing = getMissingEnv(adminVerificationRequiredEnv);
+    if (missing.length) {
+        throw new Error(`Missing email config: ${missing.join(', ')}`);
+    }
+
+    if (!smtpUser || !smtpPass) {
+        throw new Error('SMTP configuration is incomplete or invalid.');
+    }
+
+    const subject = 'Verify your Satech admin account';
+    const textBody = [
+        'Your Satech admin account has been created.',
+        `Name: ${name}`,
+        `Email: ${email}`,
+        '',
+        'Verify your email by opening this link:',
+        verificationUrl,
+        '',
+        'If you did not request this account, you can ignore this email.'
+    ].join('\n');
+
+    const htmlBody = `
+      <h2>Verify your Satech admin account</h2>
+      <p>Hello ${name},</p>
+      <p>Your admin account has been created. Please verify this email address to activate the account.</p>
+      <p><a href="${verificationUrl}">Verify email address</a></p>
+      <p><strong>Email:</strong> ${email}</p>
+      <p>If you did not request this account, you can ignore this email.</p>
+    `;
+
+    await transporter.sendMail({
+        from: `Satech Admin <${smtpUser}>`,
+        to: email,
+        subject,
+        text: textBody,
+        html: htmlBody
+    });
+};
+
+module.exports = { sendContactEmail, sendAdminVerificationEmail };
