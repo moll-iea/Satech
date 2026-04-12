@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import styles from "./AdminLogin.module.css";
 
@@ -9,6 +10,7 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [hasAdmin, setHasAdmin] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,6 +19,26 @@ export default function AdminLogin() {
       navigate("/admin", { replace: true });
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const loadStatus = async () => {
+      try {
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+        const response = await fetch(`${baseUrl}/api/users/admin/status`);
+        const payload = await response.json();
+
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.message || "Failed to load admin setup status.");
+        }
+
+        setHasAdmin(Boolean(payload.data?.hasAdmin));
+      } catch {
+        setHasAdmin(true);
+      }
+    };
+
+    loadStatus();
+  }, []);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -92,6 +114,13 @@ export default function AdminLogin() {
             {isLoading ? "Signing in..." : "Login as Admin"}
           </button>
         </form>
+
+        {hasAdmin === false && (
+          <p className={styles.footerText}>
+            No admin exists yet? <Link className={styles.link} to="/admin/register">Set up the first admin</Link>
+          </p>
+        )}
+
       </section>
     </main>
   );

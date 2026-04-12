@@ -409,7 +409,9 @@ export default function AdminDashboard() {
           <h1 className={styles.title}>Categories, Products, and Inquiries</h1>
           <p className={styles.subtitle}>Manage the content that appears on the public website from one place.</p>
         </div>
-        <button className={styles.logout} onClick={handleLogout}>Logout</button>
+        <div className={styles.headerActions}>
+          <button className={styles.logout} onClick={handleLogout}>Logout</button>
+        </div>
       </header>
 
       {!isLoading && !error && (

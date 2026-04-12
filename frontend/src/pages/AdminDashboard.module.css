@@ -16,6 +16,13 @@
   gap: 1rem;
 }
 
+.headerActions {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .tag {
   margin: 0;
   letter-spacing: 0.18em;
@@ -101,6 +108,11 @@
   box-shadow: 0 10px 24px rgba(27, 35, 30, 0.06);
 }
 
+.adminSection {
+  max-width: 1180px;
+  margin: 0 auto 1.25rem;
+}
+
 .sectionTitle {
   margin: 0 0 0.9rem;
   color: #1d2d24;
@@ -158,6 +170,10 @@
 
 .error {
   color: #a02525;
+}
+
+.success {
+  color: #2f6d43;
 }
 
 .form {

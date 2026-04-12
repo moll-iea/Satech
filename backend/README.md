@@ -41,6 +41,7 @@ npm start
 ### Users
 - `POST /api/users/admin/bootstrap` - Create first admin only (requires `x-admin-setup-key` header matching `ADMIN_SETUP_KEY`)
 - `POST /api/users/admin/login` - Admin login and JWT token issuance
+- `POST /api/users/admin/register` - Create an admin account from the admin panel (admin only)
 - `GET /api/users/admin/me` - Get logged-in admin profile (admin token required)
 - `GET /api/users` - Get all users (admin only)
 - `GET /api/users/:id` - Get user by ID (admin only)

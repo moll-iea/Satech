@@ -1,6 +1,33 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
 
+const normalizeEmail = (email) => email.trim().toLowerCase();
+
+const createAdminAccount = async ({ name, email, password, requireNoAdmins = false }) => {
+    if (requireNoAdmins) {
+        const existingAdmin = await User.findOne({ role: 'admin' });
+        if (existingAdmin) {
+            const error = new Error('Admin already exists. Use admin login.');
+            error.statusCode = 400;
+            throw error;
+        }
+    }
+
+    const existingUser = await User.findOne({ email: normalizeEmail(email) });
+    if (existingUser) {
+        const error = new Error('User with this email already exists.');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    return User.create({
+        name: name.trim(),
+        email: normalizeEmail(email),
+        password,
+        role: 'admin'
+    });
+};
+
 const getSignedToken = (user) => {
     return jwt.sign(
         { id: user._id, role: user.role },
@@ -59,6 +86,25 @@ exports.adminLogin = async (req, res) => {
     }
 };
 
+exports.getAdminSetupStatus = async (req, res) => {
+    try {
+        const adminCount = await User.countDocuments({ role: 'admin' });
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                hasAdmin: adminCount > 0
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Error checking admin setup status',
+            error: error.message
+        });
+    }
+};
+
 exports.getAdminProfile = async (req, res) => {
     try {
         return res.status(200).json({
@@ -83,26 +129,19 @@ exports.bootstrapAdmin = async (req, res) => {
     try {
         const setupKey = req.headers['x-admin-setup-key'];
         const expectedKey = process.env.ADMIN_SETUP_KEY;
-
-        if (!expectedKey) {
-            return res.status(500).json({
-                success: false,
-                message: 'ADMIN_SETUP_KEY is not configured on server.'
-            });
-        }
-
-        if (!setupKey || setupKey !== expectedKey) {
-            return res.status(403).json({
-                success: false,
-                message: 'Invalid setup key.'
-            });
-        }
-
         const existingAdmin = await User.findOne({ role: 'admin' });
+
         if (existingAdmin) {
             return res.status(400).json({
                 success: false,
                 message: 'Admin already exists. Use admin login.'
+            });
+        }
+
+        if (expectedKey && setupKey && setupKey !== expectedKey) {
+            return res.status(403).json({
+                success: false,
+                message: 'Invalid setup key.'
             });
         }
 
@@ -115,19 +154,11 @@ exports.bootstrapAdmin = async (req, res) => {
             });
         }
 
-        const existingUser = await User.findOne({ email: email.trim().toLowerCase() });
-        if (existingUser) {
-            return res.status(400).json({
-                success: false,
-                message: 'User with this email already exists.'
-            });
-        }
-
-        const admin = await User.create({
-            name: name.trim(),
-            email: email.trim().toLowerCase(),
+        const admin = await createAdminAccount({
+            name,
+            email,
             password,
-            role: 'admin'
+            requireNoAdmins: false
         });
 
         return res.status(201).json({
@@ -141,9 +172,47 @@ exports.bootstrapAdmin = async (req, res) => {
             }
         });
     } catch (error) {
-        return res.status(500).json({
+        const statusCode = error.statusCode || 500;
+        return res.status(statusCode).json({
             success: false,
-            message: 'Error creating admin account',
+            message: statusCode === 500 ? 'Error creating admin account' : error.message,
+            error: error.message
+        });
+    }
+};
+
+exports.registerAdmin = async (req, res) => {
+    try {
+        const { name, email, password } = req.body;
+
+        if (!name || !email || !password) {
+            return res.status(400).json({
+                success: false,
+                message: 'Name, email, and password are required.'
+            });
+        }
+
+        const admin = await createAdminAccount({
+            name,
+            email,
+            password
+        });
+
+        return res.status(201).json({
+            success: true,
+            message: 'Admin account created successfully.',
+            data: {
+                id: admin._id,
+                name: admin.name,
+                email: admin.email,
+                role: admin.role
+            }
+        });
+    } catch (error) {
+        const statusCode = error.statusCode || 500;
+        return res.status(statusCode).json({
+            success: false,
+            message: statusCode === 500 ? 'Error creating admin account' : error.message,
             error: error.message
         });
     }
