@@ -4,6 +4,33 @@ import styles from "./AdminDashboard.module.css";
 
 const TOKEN_KEY = "satech_admin_token";
 
+const getTokenExpiryMs = (token) => {
+  try {
+    const payloadPart = token.split(".")[1];
+    if (!payloadPart) {
+      return null;
+    }
+
+    const payload = JSON.parse(atob(payloadPart));
+    if (!payload.exp) {
+      return null;
+    }
+
+    return payload.exp * 1000;
+  } catch {
+    return null;
+  }
+};
+
+const isTokenExpired = (token) => {
+  const expiryMs = getTokenExpiryMs(token);
+  if (!expiryMs) {
+    return true;
+  }
+
+  return Date.now() >= expiryMs;
+};
+
 const EMPTY_CATEGORY_FORM = {
   name: "",
   description: "",
@@ -68,6 +95,28 @@ export default function AdminDashboard() {
     return () => URL.revokeObjectURL(previewUrl);
   }, [imageFile]);
 
+  useEffect(() => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem(TOKEN_KEY);
+      navigate("/admin/login?sessionExpired=1", { replace: true });
+      return undefined;
+    }
+
+    const expiryMs = getTokenExpiryMs(token);
+    if (!expiryMs) {
+      return undefined;
+    }
+
+    const timeoutMs = Math.max(0, expiryMs - Date.now());
+    const timeoutId = window.setTimeout(() => {
+      localStorage.removeItem(TOKEN_KEY);
+      navigate("/admin/login?sessionExpired=1", { replace: true });
+    }, timeoutMs);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [navigate]);
+
   const authHeaders = () => {
     const token = localStorage.getItem(TOKEN_KEY);
     return {
@@ -102,7 +151,8 @@ export default function AdminDashboard() {
 
   const loadAdminData = async () => {
     const token = localStorage.getItem(TOKEN_KEY);
-    if (!token) {
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem(TOKEN_KEY);
       navigate("/admin/login", { replace: true });
       return;
     }

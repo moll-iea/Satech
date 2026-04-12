@@ -5,6 +5,33 @@ import styles from "./AdminLogin.module.css";
 
 const TOKEN_KEY = "satech_admin_token";
 
+const getTokenExpiryMs = (token) => {
+  try {
+    const payloadPart = token.split(".")[1];
+    if (!payloadPart) {
+      return null;
+    }
+
+    const payload = JSON.parse(atob(payloadPart));
+    if (!payload.exp) {
+      return null;
+    }
+
+    return payload.exp * 1000;
+  } catch {
+    return null;
+  }
+};
+
+const isTokenExpired = (token) => {
+  const expiryMs = getTokenExpiryMs(token);
+  if (!expiryMs) {
+    return true;
+  }
+
+  return Date.now() >= expiryMs;
+};
+
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,8 +44,13 @@ export default function AdminLogin() {
 
   useEffect(() => {
     const token = localStorage.getItem(TOKEN_KEY);
-    if (token) {
+    if (token && !isTokenExpired(token)) {
       navigate("/admin", { replace: true });
+      return;
+    }
+
+    if (token && isTokenExpired(token)) {
+      localStorage.removeItem(TOKEN_KEY);
     }
   }, [navigate]);
 
@@ -52,6 +84,10 @@ export default function AdminLogin() {
 
     if (params.get("checkEmail") === "1") {
       setMessage("Your admin account was created. Check your email to verify it before signing in.");
+    }
+
+    if (params.get("sessionExpired") === "1") {
+      setMessage("Your admin session has expired. Please sign in again.");
     }
   }, [location.search]);
 

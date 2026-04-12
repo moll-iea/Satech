@@ -14,6 +14,7 @@ npm install
    - Set `MONGODB_URI` to your MongoDB Atlas connection string
    - Replace `<db_password>` with your real database user password
    - Set a strong `JWT_SECRET`
+   - Optional: set `ADMIN_JWT_EXPIRES_IN` (e.g., `8h`, `12h`, `1d`) for admin session expiry
    - Set Gmail SMTP values (`SMTP_USER`, `SMTP_PASS`, and `CONTACT_RECEIVER_EMAIL`)
    - Set `FRONTEND_URL` to your frontend app URL for admin email verification redirects
 
