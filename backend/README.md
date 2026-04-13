@@ -14,7 +14,9 @@ npm install
    - Set `MONGODB_URI` to your MongoDB Atlas connection string
    - Replace `<db_password>` with your real database user password
    - Set a strong `JWT_SECRET`
+   - Optional: set `ADMIN_JWT_EXPIRES_IN` (e.g., `8h`, `12h`, `1d`) for admin session expiry
    - Set Gmail SMTP values (`SMTP_USER`, `SMTP_PASS`, and `CONTACT_RECEIVER_EMAIL`)
+   - Set `FRONTEND_URL` to your frontend app URL for admin email verification redirects
 
 ### Gmail Contact Delivery Setup
 
@@ -39,8 +41,9 @@ npm start
 ## API Endpoints
 
 ### Users
-- `POST /api/users/admin/bootstrap` - Create first admin only (requires `x-admin-setup-key` header matching `ADMIN_SETUP_KEY`)
+- `POST /api/users/admin/bootstrap` - Create first admin only and send a verification email
 - `POST /api/users/admin/login` - Admin login and JWT token issuance
+- `GET /api/users/admin/verify-email?token=...` - Verify an admin email from the email link
 - `GET /api/users/admin/me` - Get logged-in admin profile (admin token required)
 - `GET /api/users` - Get all users (admin only)
 - `GET /api/users/:id` - Get user by ID (admin only)

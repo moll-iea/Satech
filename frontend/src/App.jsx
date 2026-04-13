@@ -8,6 +8,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import NewsAdmin from "./components/NewsAdmin";
 import ExhibitionAdmin from "./components/ExhibitionAdmin";
+import AdminRegister from "./pages/AdminRegister";
 
 export default function App() {
   return (
@@ -16,6 +17,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/register" element={<AdminRegister />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/news" element={<NewsAdmin />} />
         <Route path="/admin/exhibitions" element={<ExhibitionAdmin />} />

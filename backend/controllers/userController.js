@@ -1,11 +1,58 @@
 const User = require('../models/User');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const { sendAdminVerificationEmail } = require('../config/mailer');
+
+const normalizeEmail = (email) => email.trim().toLowerCase();
+
+const buildVerificationToken = () => crypto.randomBytes(32).toString('hex');
+
+const hashVerificationToken = (token) => crypto.createHash('sha256').update(token).digest('hex');
+
+const createPendingAdminAccount = async ({ name, email, password, verificationUrlBase }) => {
+    const existingUser = await User.findOne({ email: normalizeEmail(email) });
+    if (existingUser) {
+        const error = new Error('User with this email already exists.');
+        error.statusCode = 400;
+        throw error;
+    }
+
+    const admin = await User.create({
+        name: name.trim(),
+        email: normalizeEmail(email),
+        password,
+        role: 'admin',
+        isEmailVerified: false
+    });
+
+    const verificationToken = buildVerificationToken();
+    admin.emailVerificationToken = hashVerificationToken(verificationToken);
+    admin.emailVerificationExpires = Date.now() + 1000 * 60 * 60 * 24;
+    await admin.save({ validateBeforeSave: false });
+
+    const verificationUrl = `${verificationUrlBase}/api/users/admin/verify-email?token=${verificationToken}`;
+
+    try {
+        await sendAdminVerificationEmail({
+            name: admin.name,
+            email: admin.email,
+            verificationUrl
+        });
+    } catch (error) {
+        await User.findByIdAndDelete(admin._id);
+        const sendError = new Error(error.message || 'Failed to send verification email.');
+        sendError.statusCode = 500;
+        throw sendError;
+    }
+
+    return admin;
+};
 
 const getSignedToken = (user) => {
     return jwt.sign(
         { id: user._id, role: user.role },
         process.env.JWT_SECRET,
-        { expiresIn: '7d' }
+        { expiresIn: process.env.ADMIN_JWT_EXPIRES_IN || '12h' }
     );
 };
 
@@ -26,6 +73,13 @@ exports.adminLogin = async (req, res) => {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid admin credentials.'
+            });
+        }
+
+        if (!user.isEmailVerified) {
+            return res.status(403).json({
+                success: false,
+                message: 'Please verify your email before signing in.'
             });
         }
 
@@ -59,6 +113,57 @@ exports.adminLogin = async (req, res) => {
     }
 };
 
+exports.getAdminSetupStatus = async (req, res) => {
+    try {
+        const adminCount = await User.countDocuments({ role: 'admin' });
+
+        return res.status(200).json({
+            success: true,
+            data: {
+                hasAdmin: adminCount > 0
+            }
+        });
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: 'Error checking admin setup status',
+            error: error.message
+        });
+    }
+};
+
+exports.verifyAdminEmail = async (req, res) => {
+    try {
+        const { token } = req.query;
+
+        if (!token) {
+            return res.status(400).send('Verification token is required.');
+        }
+
+        const hashedToken = hashVerificationToken(token);
+        const admin = await User.findOne({
+            role: 'admin',
+            emailVerificationToken: hashedToken,
+            emailVerificationExpires: { $gt: Date.now() }
+        });
+
+        if (!admin) {
+            return res.status(400).send('Verification link is invalid or has expired.');
+        }
+
+        admin.isEmailVerified = true;
+        admin.emailVerifiedAt = new Date();
+        admin.emailVerificationToken = undefined;
+        admin.emailVerificationExpires = undefined;
+        await admin.save({ validateBeforeSave: false });
+
+        const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+        return res.redirect(`${frontendUrl}/admin/login?verified=1`);
+    } catch (error) {
+        return res.status(500).send('Error verifying admin email.');
+    }
+};
+
 exports.getAdminProfile = async (req, res) => {
     try {
         return res.status(200).json({
@@ -83,26 +188,19 @@ exports.bootstrapAdmin = async (req, res) => {
     try {
         const setupKey = req.headers['x-admin-setup-key'];
         const expectedKey = process.env.ADMIN_SETUP_KEY;
-
-        if (!expectedKey) {
-            return res.status(500).json({
-                success: false,
-                message: 'ADMIN_SETUP_KEY is not configured on server.'
-            });
-        }
-
-        if (!setupKey || setupKey !== expectedKey) {
-            return res.status(403).json({
-                success: false,
-                message: 'Invalid setup key.'
-            });
-        }
-
         const existingAdmin = await User.findOne({ role: 'admin' });
+
         if (existingAdmin) {
             return res.status(400).json({
                 success: false,
                 message: 'Admin already exists. Use admin login.'
+            });
+        }
+
+        if (expectedKey && setupKey && setupKey !== expectedKey) {
+            return res.status(403).json({
+                success: false,
+                message: 'Invalid setup key.'
             });
         }
 
@@ -115,19 +213,12 @@ exports.bootstrapAdmin = async (req, res) => {
             });
         }
 
-        const existingUser = await User.findOne({ email: email.trim().toLowerCase() });
-        if (existingUser) {
-            return res.status(400).json({
-                success: false,
-                message: 'User with this email already exists.'
-            });
-        }
-
-        const admin = await User.create({
-            name: name.trim(),
-            email: email.trim().toLowerCase(),
+        const verificationBaseUrl = `${req.protocol}://${req.get('host')}`;
+        const admin = await createPendingAdminAccount({
+            name,
+            email,
             password,
-            role: 'admin'
+            verificationUrlBase: verificationBaseUrl
         });
 
         return res.status(201).json({
@@ -141,9 +232,10 @@ exports.bootstrapAdmin = async (req, res) => {
             }
         });
     } catch (error) {
-        return res.status(500).json({
+        const statusCode = error.statusCode || 500;
+        return res.status(statusCode).json({
             success: false,
-            message: 'Error creating admin account',
+            message: statusCode === 500 ? 'Error creating admin account' : error.message,
             error: error.message
         });
     }

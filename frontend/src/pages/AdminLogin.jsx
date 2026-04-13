@@ -1,26 +1,100 @@
 import React, { useEffect, useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import styles from "./AdminLogin.module.css";
 
 const TOKEN_KEY = "satech_admin_token";
 
+const getTokenExpiryMs = (token) => {
+  try {
+    const payloadPart = token.split(".")[1];
+    if (!payloadPart) {
+      return null;
+    }
+
+    const payload = JSON.parse(atob(payloadPart));
+    if (!payload.exp) {
+      return null;
+    }
+
+    return payload.exp * 1000;
+  } catch {
+    return null;
+  }
+};
+
+const isTokenExpired = (token) => {
+  const expiryMs = getTokenExpiryMs(token);
+  if (!expiryMs) {
+    return true;
+  }
+
+  return Date.now() >= expiryMs;
+};
+
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [hasAdmin, setHasAdmin] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const token = localStorage.getItem(TOKEN_KEY);
-    if (token) {
+    if (token && !isTokenExpired(token)) {
       navigate("/admin", { replace: true });
+      return;
+    }
+
+    if (token && isTokenExpired(token)) {
+      localStorage.removeItem(TOKEN_KEY);
     }
   }, [navigate]);
+
+  useEffect(() => {
+    const loadStatus = async () => {
+      try {
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+        const response = await fetch(`${baseUrl}/api/users/admin/status`);
+        const payload = await response.json();
+
+        if (!response.ok || !payload.success) {
+          throw new Error(payload.message || "Failed to load admin setup status.");
+        }
+
+        setHasAdmin(Boolean(payload.data?.hasAdmin));
+      } catch {
+        setHasAdmin(true);
+      }
+    };
+
+    loadStatus();
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    setMessage("");
+
+    if (params.get("verified") === "1") {
+      setMessage("Email verified successfully. You can sign in now.");
+    }
+
+    if (params.get("checkEmail") === "1") {
+      setMessage("Your admin account was created. Check your email to verify it before signing in.");
+    }
+
+    if (params.get("sessionExpired") === "1") {
+      setMessage("Your admin session has expired. Please sign in again.");
+    }
+  }, [location.search]);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     setError("");
+    setMessage("");
 
     if (!email.trim() || !password.trim()) {
       setError("Email and password are required.");
@@ -62,6 +136,7 @@ export default function AdminLogin() {
         <p className={styles.tag}>SATECH ADMIN</p>
         <h1 className={styles.title}>Sign in</h1>
         <p className={styles.subtitle}>Admin-only access panel for inquiry management.</p>
+        {message && <p className={styles.success}>{message}</p>}
 
         <form className={styles.form} onSubmit={handleSubmit}>
           <label className={styles.label} htmlFor="admin-email">Email</label>
@@ -92,6 +167,13 @@ export default function AdminLogin() {
             {isLoading ? "Signing in..." : "Login as Admin"}
           </button>
         </form>
+
+        {hasAdmin === false && (
+          <p className={styles.footerText}>
+            No admin exists yet? <Link className={styles.link} to="/admin/register">Set up the first admin</Link>
+          </p>
+        )}
+
       </section>
     </main>
   );

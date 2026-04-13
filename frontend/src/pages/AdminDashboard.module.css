@@ -231,6 +231,13 @@
   gap: 1rem;
 }
 
+.headerActions {
+  display: flex;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .topbarClock {
   font-size: 0.75rem;
   color: #3a6a7a;
@@ -400,6 +407,11 @@
   font-size: 0.9rem;
   color: #c0d8e4;
   font-weight: 600;
+}
+
+.adminSection {
+  max-width: 1180px;
+  margin: 0 auto 1.25rem;
 }
 
 .quickCardBody p {
@@ -580,7 +592,13 @@
   transition: border-color 0.2s;
 }
 
-.inqPreviewRow:hover { border-color: #1a4060; }
+.error {
+  color: #a02525;
+}
+
+.success {
+  color: #2f6d43;
+}
 
 .inqAvatar {
   width: 34px;

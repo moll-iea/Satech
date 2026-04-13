@@ -4,7 +4,9 @@ const userController = require('../controllers/userController');
 const { protect, authorize } = require('../middleware/auth');
 
 router.post('/admin/login', userController.adminLogin);
+router.get('/admin/status', userController.getAdminSetupStatus);
 router.post('/admin/bootstrap', userController.bootstrapAdmin);
+router.get('/admin/verify-email', userController.verifyAdminEmail);
 router.get('/admin/me', protect, authorize('admin'), userController.getAdminProfile);
 
 // User routes

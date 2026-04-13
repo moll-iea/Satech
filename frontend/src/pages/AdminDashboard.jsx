@@ -8,6 +8,33 @@ import { videoService } from '../services/videoService';
 
 const TOKEN_KEY = "satech_admin_token";
 
+const getTokenExpiryMs = (token) => {
+  try {
+    const payloadPart = token.split(".")[1];
+    if (!payloadPart) {
+      return null;
+    }
+
+    const payload = JSON.parse(atob(payloadPart));
+    if (!payload.exp) {
+      return null;
+    }
+
+    return payload.exp * 1000;
+  } catch {
+    return null;
+  }
+};
+
+const isTokenExpired = (token) => {
+  const expiryMs = getTokenExpiryMs(token);
+  if (!expiryMs) {
+    return true;
+  }
+
+  return Date.now() >= expiryMs;
+};
+
 const EMPTY_CATEGORY_FORM = { name: "", description: "" };
 const EMPTY_PRODUCT_FORM = { name: "", detail: "", categoryId: "" };
 const EMPTY_VIDEO_FORM = { title: "", url: "", description: "" };
@@ -109,6 +136,28 @@ export default function AdminDashboard() {
   }, [imageFile]);
 
   useEffect(() => {
+    const token = localStorage.getItem(TOKEN_KEY);
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem(TOKEN_KEY);
+      navigate("/admin/login?sessionExpired=1", { replace: true });
+      return undefined;
+    }
+
+    const expiryMs = getTokenExpiryMs(token);
+    if (!expiryMs) {
+      return undefined;
+    }
+
+    const timeoutMs = Math.max(0, expiryMs - Date.now());
+    const timeoutId = window.setTimeout(() => {
+      localStorage.removeItem(TOKEN_KEY);
+      navigate("/admin/login?sessionExpired=1", { replace: true });
+    }, timeoutMs);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [navigate]);
+
+  useEffect(() => {
     if (!videoThumbnailFile) { setVideoThumbnailPreview(""); return; }
     const url = URL.createObjectURL(videoThumbnailFile);
     setVideoThumbnailPreview(url);
@@ -120,7 +169,12 @@ export default function AdminDashboard() {
 
   const loadAdminData = async () => {
     const token = localStorage.getItem(TOKEN_KEY);
-    if (!token) { navigate("/admin/login", { replace: true }); return; }
+    if (!token || isTokenExpired(token)) {
+      localStorage.removeItem(TOKEN_KEY);
+      navigate("/admin/login", { replace: true });
+      return;
+    }
+
     try {
       setIsLoading(true); setError("");
       const baseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
