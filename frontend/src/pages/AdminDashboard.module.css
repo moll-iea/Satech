@@ -435,7 +435,7 @@
 /* ── Analytics ─────────────────────────────────────────── */
 .analyticsRow {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 1rem;
 }
 
@@ -447,6 +447,42 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+}
+
+.analyticsCardInteractive {
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: transform 0.18s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.analyticsCardInteractive:hover {
+  transform: translateY(-2px);
+  border-color: #1b4f63;
+  box-shadow: 0 10px 24px rgba(0, 229, 255, 0.08);
+}
+
+.analyticsCardInteractive:focus-visible {
+  outline: 2px solid #00e5ff;
+  outline-offset: 2px;
+}
+
+.chartShell {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.chartShellExpanded {
+  min-height: 320px;
+}
+
+.chartCardHint {
+  margin-top: auto;
+  font-size: 0.67rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #2f7386;
 }
 
 .analyticsHeader {
@@ -506,6 +542,58 @@
   color: #2d5060;
   position: absolute;
   bottom: 0;
+}
+
+/* Chart Modal */
+.chartModalBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  background: rgba(2, 8, 12, 0.74);
+  backdrop-filter: blur(5px);
+  padding: 1.2rem;
+}
+
+.chartModal {
+  width: min(980px, 100%);
+  max-height: 90vh;
+  overflow-y: auto;
+  background: #08131a;
+  border: 1px solid #144658;
+  border-radius: 16px;
+  padding: 1rem 1rem 1.2rem;
+  box-shadow: 0 24px 48px rgba(0, 0, 0, 0.45);
+}
+
+.chartModalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+.chartModalHeader h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  color: #d3edf7;
+  text-transform: uppercase;
+}
+
+.chartModalActions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.chartModalCanvas {
+  border: 1px solid #0d2030;
+  border-radius: 12px;
+  background: #091318;
+  padding: 1.1rem;
 }
 
 /* Category dist */

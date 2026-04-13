@@ -1,9 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./AdminDashboard.module.css";
 import { toast } from 'sonner';
 import jsPDF from 'jspdf';
 import * as XLSX from 'xlsx';
+import html2canvas from 'html2canvas';
 import { videoService } from '../services/videoService';
 
 const TOKEN_KEY = "satech_admin_token";
@@ -38,6 +39,7 @@ const isTokenExpired = (token) => {
 const EMPTY_CATEGORY_FORM = { name: "", description: "" };
 const EMPTY_PRODUCT_FORM = { name: "", detail: "", categoryId: "" };
 const EMPTY_VIDEO_FORM = { title: "", url: "", description: "" };
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 const resolveImageUrl = (imagePath) => {
   if (!imagePath) return "";
@@ -74,6 +76,52 @@ const MiniBarChart = ({ data, labels, color }) => {
   );
 };
 
+const toTimestamp = (value) => {
+  const ts = new Date(value).getTime();
+  return Number.isFinite(ts) ? ts : null;
+};
+
+const buildSevenDaySeries = (items = []) => {
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const windowStart = todayStart - 6 * DAY_MS;
+  const windowEnd = todayStart + DAY_MS - 1;
+  const previousWindowStart = windowStart - 7 * DAY_MS;
+
+  const labels = Array.from({ length: 7 }, (_, index) =>
+    new Date(windowStart + index * DAY_MS).toLocaleDateString("en-US", { weekday: "short" })
+  );
+  const counts = Array(7).fill(0);
+  let previousTotal = 0;
+
+  items.forEach((item) => {
+    const ts = toTimestamp(item?.createdAt);
+    if (ts === null) return;
+
+    if (ts >= windowStart && ts <= windowEnd) {
+      const index = Math.floor((ts - windowStart) / DAY_MS);
+      if (index >= 0 && index < counts.length) counts[index] += 1;
+      return;
+    }
+
+    if (ts >= previousWindowStart && ts < windowStart) {
+      previousTotal += 1;
+    }
+  });
+
+  const currentTotal = counts.reduce((sum, value) => sum + value, 0);
+  return { labels, counts, currentTotal, previousTotal };
+};
+
+const formatTrend = (current, previous, unit = "items") => {
+  if (current === 0 && previous === 0) return `No new ${unit} in the last 7 days`;
+  if (previous === 0) return `+${current} ${unit} in the last 7 days`;
+  const delta = current - previous;
+  const percent = Math.round((Math.abs(delta) / previous) * 100);
+  if (delta === 0) return `No change vs previous 7 days`;
+  return `${delta > 0 ? "+" : "-"}${percent}% vs previous 7 days`;
+};
+
 export default function AdminDashboard() {
   const [messages, setMessages] = useState([]);
   const [products, setProducts] = useState([]);
@@ -101,22 +149,60 @@ export default function AdminDashboard() {
   const [videoThumbnailPreview, setVideoThumbnailPreview] = useState("");
   const [currentVideoThumbnail, setCurrentVideoThumbnail] = useState("");
   const [expandedMsg, setExpandedMsg] = useState(null);
+  const [expandedChart, setExpandedChart] = useState(null);
+  const [isChartExporting, setIsChartExporting] = useState(false);
+  const expandedChartRef = useRef(null);
   const navigate = useNavigate();
 
   const canSubmitProduct = productForm.name.trim() && productForm.categoryId;
   const canSubmitVideo = videoForm.title.trim() && videoForm.url.trim();
 
+  const categorySeries = useMemo(() => buildSevenDaySeries(categories), [categories]);
+  const productSeries = useMemo(() => buildSevenDaySeries(products), [products]);
+  const inquirySeries = useMemo(() => buildSevenDaySeries(messages), [messages]);
+
   const stats = useMemo(() => [
-    { label: "Categories", value: categories.length, icon: "◈", trend: "+2 this month", spark: [2,3,3,4,4,5,categories.length], color: "#00e5ff" },
-    { label: "Products", value: products.length, icon: "⬡", trend: "+5 this month", spark: [8,10,12,14,16,18,products.length], color: "#7c3aed" },
-    { label: "Inquiries", value: messages.length, icon: "⌁", trend: "Active leads", spark: [3,5,4,7,6,8,messages.length], color: "#10b981" },
-  ], [categories.length, products.length, messages.length]);
+    {
+      label: "Categories",
+      value: categories.length,
+      icon: "◈",
+      trend: formatTrend(categorySeries.currentTotal, categorySeries.previousTotal, "categories"),
+      spark: categorySeries.counts,
+      color: "#00e5ff"
+    },
+    {
+      label: "Products",
+      value: products.length,
+      icon: "⬡",
+      trend: formatTrend(productSeries.currentTotal, productSeries.previousTotal, "products"),
+      spark: productSeries.counts,
+      color: "#7c3aed"
+    },
+    {
+      label: "Inquiries",
+      value: messages.length,
+      icon: "⌁",
+      trend: formatTrend(inquirySeries.currentTotal, inquirySeries.previousTotal, "inquiries"),
+      spark: inquirySeries.counts,
+      color: "#10b981"
+    },
+  ], [
+    categories.length,
+    products.length,
+    messages.length,
+    categorySeries,
+    productSeries,
+    inquirySeries,
+  ]);
 
   const inquiryByDay = useMemo(() => {
-    const days = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"];
-    const counts = days.map(() => Math.floor(Math.random() * 8));
-    return { days, counts };
-  }, [messages.length]);
+    return {
+      days: inquirySeries.labels,
+      counts: inquirySeries.counts,
+      currentTotal: inquirySeries.currentTotal,
+      previousTotal: inquirySeries.previousTotal,
+    };
+  }, [inquirySeries]);
 
   const categoryDist = useMemo(() => {
     return categories.map(cat => ({
@@ -127,6 +213,106 @@ export default function AdminDashboard() {
       }).length,
     }));
   }, [categories, products]);
+
+  const getOverviewChartMeta = (type) => {
+    if (type === "inquiries") {
+      return { type: "inquiries", title: "Inquiries This Week", fileName: "inquiries-this-week" };
+    }
+    return { type: "category", title: "Products by Category", fileName: "products-by-category" };
+  };
+
+  const renderOverviewChart = (type, expanded = false) => {
+    const chartShellClass = `${styles.chartShell} ${expanded ? styles.chartShellExpanded : ""}`;
+
+    if (type === "inquiries") {
+      return (
+        <div className={chartShellClass}>
+          <div className={styles.analyticsHeader}>
+            <span className={styles.analyticsTitle}>Inquiries This Week</span>
+            <span className={styles.analyticsBadge} style={{ color: "#10b981" }}>
+              {formatTrend(inquiryByDay.currentTotal, inquiryByDay.previousTotal, "inquiries")}
+            </span>
+          </div>
+          <MiniBarChart data={inquiryByDay.counts} labels={inquiryByDay.days} color="#10b981" />
+          <div className={styles.analyticsFooter}>
+            Total in last 7 days: {inquiryByDay.currentTotal} inquiries
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className={chartShellClass}>
+        <div className={styles.analyticsHeader}>
+          <span className={styles.analyticsTitle}>Products by Category</span>
+        </div>
+        <div className={styles.categoryDistList}>
+          {categoryDist.length === 0 && <span className={styles.emptyNote}>No data yet</span>}
+          {categoryDist.map(cd => (
+            <div key={cd.name} className={styles.catDistRow}>
+              <span className={styles.catDistName}>{cd.name}</span>
+              <div className={styles.catDistBar}>
+                <div
+                  className={styles.catDistFill}
+                  style={{ width: `${Math.max((cd.count / (products.length || 1)) * 100, 4)}%` }}
+                />
+              </div>
+              <span className={styles.catDistCount}>{cd.count}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const openChartModal = (type) => {
+    setExpandedChart(getOverviewChartMeta(type));
+  };
+
+  const closeChartModal = () => {
+    if (!isChartExporting) setExpandedChart(null);
+  };
+
+  const downloadExpandedChartPdf = async () => {
+    if (!expandedChartRef.current || !expandedChart) return;
+
+    try {
+      setIsChartExporting(true);
+      const canvas = await html2canvas(expandedChartRef.current, {
+        backgroundColor: "#091318",
+        scale: 2,
+        useCORS: true,
+      });
+
+      const image = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: "a4" });
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      const margin = 10;
+      const maxWidth = pageWidth - margin * 2;
+      const maxHeight = pageHeight - margin * 2;
+      const imageRatio = canvas.width / canvas.height;
+
+      let renderWidth = maxWidth;
+      let renderHeight = renderWidth / imageRatio;
+
+      if (renderHeight > maxHeight) {
+        renderHeight = maxHeight;
+        renderWidth = renderHeight * imageRatio;
+      }
+
+      const x = (pageWidth - renderWidth) / 2;
+      const y = (pageHeight - renderHeight) / 2;
+
+      pdf.addImage(image, "PNG", x, y, renderWidth, renderHeight);
+      pdf.save(`${expandedChart.fileName}.pdf`);
+      toast.success("Chart PDF downloaded!");
+    } catch (err) {
+      toast.error("Failed to export chart PDF.");
+    } finally {
+      setIsChartExporting(false);
+    }
+  };
 
   useEffect(() => {
     if (!imageFile) { setImagePreview(""); return; }
@@ -736,63 +922,25 @@ export default function AdminDashboard() {
               {/* Analytics Row */}
               <div className={styles.sectionLabel}>ANALYTICS</div>
               <div className={styles.analyticsRow}>
-                <div className={styles.analyticsCard}>
-                  <div className={styles.analyticsHeader}>
-                    <span className={styles.analyticsTitle}>Inquiries This Week</span>
-                    <span className={styles.analyticsBadge} style={{ color: "#10b981" }}>LIVE</span>
-                  </div>
-                  <MiniBarChart data={inquiryByDay.counts} labels={inquiryByDay.days} color="#10b981" />
-                  <div className={styles.analyticsFooter}>
-                    Total: {inquiryByDay.counts.reduce((a, b) => a + b, 0)} inquiries
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  className={`${styles.analyticsCard} ${styles.analyticsCardInteractive}`}
+                  onClick={() => openChartModal("inquiries")}
+                  aria-label="Expand inquiries chart"
+                >
+                  {renderOverviewChart("inquiries")}
+                  <span className={styles.chartCardHint}>Click to expand and download PDF</span>
+                </button>
 
-                <div className={styles.analyticsCard}>
-                  <div className={styles.analyticsHeader}>
-                    <span className={styles.analyticsTitle}>Products by Category</span>
-                  </div>
-                  <div className={styles.categoryDistList}>
-                    {categoryDist.length === 0 && <span className={styles.emptyNote}>No data yet</span>}
-                    {categoryDist.map(cd => (
-                      <div key={cd.name} className={styles.catDistRow}>
-                        <span className={styles.catDistName}>{cd.name}</span>
-                        <div className={styles.catDistBar}>
-                          <div
-                            className={styles.catDistFill}
-                            style={{ width: `${Math.max((cd.count / (products.length || 1)) * 100, 4)}%` }}
-                          />
-                        </div>
-                        <span className={styles.catDistCount}>{cd.count}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className={styles.analyticsCard}>
-                  <div className={styles.analyticsHeader}>
-                    <span className={styles.analyticsTitle}>System Summary</span>
-                  </div>
-                  <div className={styles.summaryList}>
-                    <div className={styles.summaryRow}>
-                      <span>Total SKUs</span>
-                      <span className={styles.summaryVal}>{products.length}</span>
-                    </div>
-                    <div className={styles.summaryRow}>
-                      <span>Product Lines</span>
-                      <span className={styles.summaryVal}>{categories.length}</span>
-                    </div>
-                    <div className={styles.summaryRow}>
-                      <span>Open Inquiries</span>
-                      <span className={styles.summaryVal} style={{ color: "#10b981" }}>{messages.length}</span>
-                    </div>
-                    <div className={styles.summaryRow}>
-                      <span>Conversion Rate</span>
-                      <span className={styles.summaryVal} style={{ color: "#00e5ff" }}>
-                        {products.length ? `${Math.round((messages.length / products.length) * 10) / 10}x` : "—"}
-                      </span>
-                    </div>
-                  </div>
-                </div>
+                <button
+                  type="button"
+                  className={`${styles.analyticsCard} ${styles.analyticsCardInteractive}`}
+                  onClick={() => openChartModal("category")}
+                  aria-label="Expand products by category chart"
+                >
+                  {renderOverviewChart("category")}
+                  <span className={styles.chartCardHint}>Click to expand and download PDF</span>
+                </button>
               </div>
 
               {/* Recent Inquiries Preview */}
@@ -1143,6 +1291,31 @@ export default function AdminDashboard() {
             </div>
           )}
         </div>
+
+        {expandedChart && (
+          <div className={styles.chartModalBackdrop} onClick={closeChartModal}>
+            <div className={styles.chartModal} onClick={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
+              <div className={styles.chartModalHeader}>
+                <h3>{expandedChart.title}</h3>
+                <div className={styles.chartModalActions}>
+                  <button
+                    type="button"
+                    className={styles.downloadBtn}
+                    onClick={downloadExpandedChartPdf}
+                    disabled={isChartExporting}
+                  >
+                    {isChartExporting ? "Preparing PDF..." : "📄 Download PDF"}
+                  </button>
+                  <button type="button" className={styles.clearBtn} onClick={closeChartModal}>Close</button>
+                </div>
+              </div>
+
+              <div ref={expandedChartRef} className={styles.chartModalCanvas}>
+                {renderOverviewChart(expandedChart.type, true)}
+              </div>
+            </div>
+          </div>
+        )}
 
       </main>
     </div>
