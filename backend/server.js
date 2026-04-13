@@ -13,6 +13,7 @@ const productRoutes = require('./routes/productRoutes');
 const categoryRoutes = require('./routes/categoryRoutes');
 const newsRoutes = require('./routes/newsRoutes');
 const exhibitionRoutes = require('./routes/exhibitionRoutes');
+const videoRoutes = require('./routes/videoRoutes');
 
 const app = express();
 
@@ -37,6 +38,7 @@ app.use('/api/products', productRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/news', newsRoutes);
 app.use('/api/exhibitions', exhibitionRoutes);
+app.use('/api/videos', videoRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {

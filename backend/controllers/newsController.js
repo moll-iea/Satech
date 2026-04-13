@@ -37,7 +37,7 @@ exports.createNews = async (req, res) => {
     date: new Date(date),
     summary,
     link: link || '#',
-    imageUrl: req.file ? req.file.path : null,  // Use req.file, not req.body
+    imageUrl: req.file ? `http://localhost:5000/${req.file.path}` : null,  // Use req.file, not req.body
   });
 
   try {
@@ -51,7 +51,7 @@ exports.createNews = async (req, res) => {
 // Update news article
 exports.updateNews = async (req, res) => {
   const { id } = req.params;
-  const { title, category, date, summary, link, imageUrl } = req.body;
+  const { title, category, date, summary, link } = req.body;
 
   try {
     const news = await News.findById(id);
@@ -64,7 +64,9 @@ exports.updateNews = async (req, res) => {
     if (date) news.date = new Date(date);
     if (summary) news.summary = summary;
     if (link) news.link = link;
-    if (imageUrl) news.imageUrl = imageUrl;
+    if (req.file) {
+      news.imageUrl = `http://localhost:5000/${req.file.path.replace(/\\/g, '/')}`;
+    }
     news.updatedAt = Date.now();
 
     const updatedNews = await news.save();
