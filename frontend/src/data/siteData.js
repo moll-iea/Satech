@@ -3,11 +3,11 @@
 // ─────────────────────────────────────────────
 
 export const NAV_LINKS = [
-  { label: "About",    href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Products", href: "#products" },
-  { label: "Clients",  href: "#clients" },
-  { label: "News",     href: "#news" },
+  { label: "Products",        href: "#products" },
+  { label: "Services",        href: "#services" },
+  { label: "News & Articles", href: "#news" },
+  { label: "Exhibitions",     href: "#exhibitions" },
+  { label: "About Us",        href: "#about" },
 ];
 
 export const HERO_STATS = [

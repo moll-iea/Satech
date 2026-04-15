@@ -6,6 +6,7 @@ import MarqueeBar from "../components/MarqueeBar";
 import About from "../components/About";
 import Services from "../components/Services";
 import Products from "../components/Products";
+import Videos from "../components/Videos";  // Add this
 import Clients from "../components/Clients";
 import Global from "../components/Global";
 import Contact from "../components/Contact";
@@ -17,11 +18,12 @@ export default function HomePage() {
       <Navbar />
       <Hero />
       <MarqueeBar />
-      <About />
-      <Services />
       <Products />
-      <Clients />
+      <Services />
       <Global />
+       <Videos />
+      <Clients />
+      <About />
       <Contact />
       <Footer />
     </>

@@ -1,4 +1,33 @@
-.clients { background: var(--black); padding: 120px 60px; }
+.clients { 
+  background: var(--black); 
+  padding: 120px 60px; 
+}
+
+.container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+
+.leftContent {
+  flex: 1;
+}
+
+.rightContent {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pcbImage {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+}
 
 .header { margin-bottom: 60px; }
 
@@ -11,22 +40,23 @@
 
 .marqueeWrap {
   overflow: hidden;
-  margin-bottom: 12px;
+  margin-bottom: 40px;
+  padding: 0 60px;
 }
 
 .track {
-  --gap: 12px;
+  --gap: 20px;
   display: flex;
   gap: var(--gap);
   width: max-content;
   white-space: nowrap;
   will-change: transform;
-  animation: marqueeLeft 25s linear infinite;
+  animation: marqueeLeft 10s linear infinite;
+  padding: 0;
 }
 
 .reverse {
-  /* move from the opposite end */
-  animation: marqueeRight 25s linear infinite;
+  animation: marqueeRight 10s linear infinite;
 }
 
 .group {
@@ -42,12 +72,14 @@
   text-transform: uppercase;
   color: rgba(240,237,230,0.25);
   white-space: nowrap;
-  padding: 10px 22px;
+  padding: 15px 28px;
   border: 1px solid rgba(240,237,230,0.08);
   cursor: default;
   transition: color 0.3s, border-color 0.3s;
   flex-shrink: 0;
+  background: transparent;
 }
+
 .badge:hover {
   color: var(--gold);
   border-color: rgba(245,197,24,0.35);
@@ -55,14 +87,101 @@
 
 @keyframes marqueeLeft {
   from { transform: translateX(0); }
-  to   { transform: translateX(calc(-50% - (var(--gap) / 2))); }
+  to   { transform: translateX(-100%); }
 }
 
 @keyframes marqueeRight {
-  from { transform: translateX(calc(-50% - (var(--gap) / 2))); }
+  from { transform: translateX(-100%); }
   to   { transform: translateX(0); }
 }
 
+@media (max-width: 1200px) {
+  .container {
+    grid-template-columns: 1fr;
+    gap: 60px;
+  }
+  
+  .rightContent {
+    margin-top: 40px;
+  }
+}
+
 @media (max-width: 900px) {
-  .clients { padding: 80px 24px; }
+  .clients { 
+    padding: 80px 24px; 
+  }
+  
+  .marqueeWrap {
+    padding: 0 24px;
+  }
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background: var(--black);
+  border: 1px solid rgba(245,197,24,0.35);
+  padding: 40px;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 90vw;
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+  animation: slideIn 0.3s ease;
+}
+
+.modalContent img {
+  width: 100%;
+  height: auto;
+  max-height: 500px;
+  object-fit: contain;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.modalContent h3 {
+  color: var(--gold);
+  margin-bottom: 10px;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.closeBtn {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(245,197,24,0.2);
+  border-radius: 50%;
+  color: rgba(240,237,230,0.7);
+  cursor: pointer;
+  transition: all 0.3s;
+  padding: 0;
+}
+
+.closeBtn:hover {
+  background: rgba(245,197,24,0.15);
+  color: var(--gold);
+  border-color: rgba(245,197,24,0.5);
 }
