@@ -1,6 +1,6 @@
 .contact {
   background: var(--gold);
-  padding: 100px 60px;
+  padding: 40px 60px 40px 60px; /* top | right | bottom | left */
   position: relative;
   overflow: hidden;
 }

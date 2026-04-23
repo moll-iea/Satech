@@ -9,9 +9,9 @@ export default function Hero() {
       {/* Animated PCB canvas — replaces static .bg and .grid divs */}
       <PCBBackground />
 
-      <div className={styles.tag}>
+      {/* <div className={styles.tag}>
         📍 Muntinlupa City, Philippines · Est. 30+ Years
-      </div>
+      </div> */}
 
       <h1 className={styles.title}>
         {/* SATECH<br /> */}
@@ -20,16 +20,11 @@ export default function Hero() {
 
       {/* <p className={styles.sub}>The Solutions Provider</p> */}
 
-      <p className={styles.desc}>
-        Providing the manufacturing industry with technologically advanced
-        systems, globally competitive products, quality support, and reliable
-        business integrity for over 30 years.
+      <p className={styles.tagline}>
+        <span className={styles.colorA}>Sell</span> <span className={styles.circleText}>the problem you solve</span> <span className={styles.colorA}>,</span> <br />
+        <span className={styles.colorA}>Not the product</span> <span className={styles.circleText}>you have</span>
       </p>
 
-      <div className={styles.btns}>
-        <a href="#products" className="btn-primary">Explore Products</a>
-        <a href="#contact"  className="btn-outline">Get In Touch</a>
-      </div>
 
       <div className={styles.stats}>
         {HERO_STATS.map((s) => (

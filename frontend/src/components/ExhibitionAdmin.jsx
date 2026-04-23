@@ -15,6 +15,7 @@ export default function ExhibitionAdmin() {
   const [editingId, setEditingId] = useState(null);
   const [imageFile, setImageFile] = useState(null);
   const [imagePreview, setImagePreview] = useState("");
+  const [existingImage, setExistingImage] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [activeRow, setActiveRow] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
@@ -25,11 +26,15 @@ export default function ExhibitionAdmin() {
   useEffect(() => { checkAuth(); loadExhibitions(); }, []);
 
   useEffect(() => {
-    if (!imageFile) { setImagePreview(""); return; }
+    if (!imageFile) {
+      // Don't wipe the preview if we're editing and have an existing server image
+      setImagePreview(existingImage || "");
+      return;
+    }
     const url = URL.createObjectURL(imageFile);
     setImagePreview(url);
     return () => URL.revokeObjectURL(url);
-  }, [imageFile]);
+  }, [imageFile, existingImage]);
 
   const checkAuth = () => {
     if (!localStorage.getItem(TOKEN_KEY)) navigate("/admin/login", { replace: true });
@@ -102,7 +107,9 @@ export default function ExhibitionAdmin() {
   const handleEdit = (ex) => {
     setEditingId(ex._id);
     setForm({ name: ex.name, row: ex.row, order: ex.order });
-    setImagePreview(ex.image);
+    setImageFile(null);
+    setExistingImage(ex.image || "");
+    setImagePreview(ex.image ? `${import.meta.env.VITE_API_URL}${ex.image}` : "");
     setShowForm(true);
   };
 
@@ -117,7 +124,7 @@ export default function ExhibitionAdmin() {
 
   const handleCancel = () => {
     setEditingId(null); setForm({ name: "", row: 1, order: 0 });
-    setImageFile(null); setImagePreview(""); setShowForm(false);
+    setImageFile(null); setImagePreview(""); setExistingImage(""); setShowForm(false);
   };
 
   const matchesSearch = (item, term) => {
@@ -157,7 +164,7 @@ export default function ExhibitionAdmin() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className={styles.searchInput}
           />
-          <button onClick={() => { setShowForm(true); setEditingId(null); setImagePreview(""); setImageFile(null); setForm({ name: "", row: 1, order: 0 }); }}
+          <button onClick={() => { setShowForm(true); setEditingId(null); setImagePreview(""); setExistingImage(""); setImageFile(null); setForm({ name: "", row: 1, order: 0 }); }}
             className={styles.addBtn}>
             ⊕ New Exhibition
           </button>

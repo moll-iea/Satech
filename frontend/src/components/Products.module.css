@@ -1,111 +1,782 @@
-.products { background: var(--dark); padding: 120px 60px; }
+/* ============================================================
+   Products — TRUE 360° Rotating Drum Carousel + All Products Page
 
-.header { margin-bottom: 0; }
+   Architecture:
+   .stage      → perspective camera (static)
+   .drum       → the 3D cylinder; rotateY(Ndeg) animates here
+   .card       → pre-placed on the cylinder face, never moves
+   ============================================================ */
 
-.tabs {
-  display: flex; gap: 4px; flex-wrap: wrap;
-  margin-bottom: 48px;
+/* ── CSS Variables ─────────────────────────────────────────── */
+:root {
+  --drum-radius: 300px;       /* cylinder radius — increase to spread cards further */
+  --card-w: 200px;
+  --card-h: 290px;
+  --trans: 900ms;             /* must match TRANSITION constant in Products.jsx */
+  --gold: #ffc629;
+  --bg: #07080d;
+  --surface: #0f1018;
+  --text: #1a1a2e;
 }
 
-.loading {
-  color: rgba(240, 237, 230, 0.7);
-  margin: -24px 0 24px;
-  font-size: 12px;
-  letter-spacing: 0.08em;
+.products {
+  background: linear-gradient(135deg, #eef1f8 0%, #e2e9f5 50%, #dde6f4 100%);
+  --mx: 50%;
+  --my: 50%;
+  padding: 80px 0 0;
+  font-family: var(--font-body, 'Cormorant Garamond', Georgia, serif);
+  overflow: hidden;
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: var(--text);
+}
+
+/* ── Atmospheric Background ────────────────────────────────── */
+.bgOrb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(110px);
+  pointer-events: none;
+  z-index: 0;
+  animation: drift 18s ease-in-out infinite alternate;
+}
+
+.orb1 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(201,168,76,0.09), transparent 70%);
+  top: -160px;
+  left: -160px;
+  animation-delay: 0s;
+}
+
+.orb2 {
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(80,120,220,0.07), transparent 70%);
+  bottom: 0;
+  right: -140px;
+  animation-delay: -6s;
+}
+
+.orb3 {
+  width: 360px;
+  height: 360px;
+  background: radial-gradient(circle, rgba(180,80,120,0.05), transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  animation-delay: -12s;
+}
+
+@keyframes drift {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(30px, 20px) scale(1.08); }
+}
+
+/* Grain overlay */
+.noise {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' opacity='1'/%3E%3C/svg%3E");
+  opacity: 0.032;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Interactive Grid Lines ────────────────────────────────── */
+.gridLines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background-image:
+    linear-gradient(rgba(100, 130, 200, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(100, 130, 200, 0.07) 1px, transparent 1px);
+  background-size: 60px 60px;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 100%);
+  animation: gridShift 20s linear infinite;
+}
+
+@keyframes gridShift {
+  from { background-position: 0 0, 0 0; }
+  to   { background-position: 60px 60px, 60px 60px; }
+}
+
+/* ── Mouse-follow Spotlight ────────────────────────────────── */
+.spotlight {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(
+    600px circle at var(--mx) var(--my),
+    rgba(201, 168, 76, 0.06) 0%,
+    rgba(100, 140, 220, 0.04) 40%,
+    transparent 70%
+  );
+  transition: background 0.05s ease;
+}
+
+/* ── Floating Particles ─────────────────────────────────────── */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  animation: floatUp 12s ease-in-out infinite;
+}
+
+.p1 { width: 6px;  height: 6px;  background: rgba(201,168,76,0.5);   left: 12%;  animation-delay: 0s;   animation-duration: 11s; }
+.p2 { width: 4px;  height: 4px;  background: rgba(120,160,230,0.4);  left: 28%;  animation-delay: 2.5s; animation-duration: 14s; }
+.p3 { width: 8px;  height: 8px;  background: rgba(201,168,76,0.3);   left: 50%;  animation-delay: 5s;   animation-duration: 10s; }
+.p4 { width: 5px;  height: 5px;  background: rgba(100,140,220,0.45); left: 68%;  animation-delay: 1s;   animation-duration: 13s; }
+.p5 { width: 3px;  height: 3px;  background: rgba(201,168,76,0.55);  left: 80%;  animation-delay: 3.5s; animation-duration: 9s;  }
+.p6 { width: 7px;  height: 7px;  background: rgba(150,180,240,0.35); left: 90%;  animation-delay: 7s;   animation-duration: 15s; }
+
+@keyframes floatUp {
+  0%   { opacity: 0;   transform: translateY(100%) scale(0.5); }
+  15%  { opacity: 1; }
+  85%  { opacity: 0.6; }
+  100% { opacity: 0;   transform: translateY(-120px) scale(1.2); }
+}
+
+/* ── Hero Header ───────────────────────────────────────────── */
+.heroHeader {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 32px;
+  padding: 0 24px;
+  letter-spacing: 0.18em;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 0.68rem;
+  letter-spacing: 0.4em;
   text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 14px;
+  font-family: var(--font-mono, 'Courier New', monospace);
 }
 
-.categoryBlock {
-  margin-bottom: 56px;
+.heroTitle {
+  font-family: var(--font-display, 'Cinzel', 'Georgia', serif);
+  font-size: clamp(28px, 4vw, 46px);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text);
+  margin: 0;
+  letter-spacing: -0.5px;
 }
 
-.categoryTitle {
-  margin: 0 0 18px;
-  font-family: var(--font-display);
-  font-size: 24px;
-  letter-spacing: 1px;
+.heroTitle em {
+  font-style: italic;
+  color: var(--gold);
+  font-family: var(--font-body, 'Cormorant Garamond', Georgia, serif);
+}
+
+/* ── Filter Pills ──────────────────────────────────────────── */
+.filterRow {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 40px;
+  padding: 0 24px;
+}
+
+.pill {
+  font-size: 12px;
+  letter-spacing: 0.06em;
+  text-transform: capitalize;
+  padding: 8px 22px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(201, 168, 76, 0.28);
+  background: transparent;
+  color: #1a1a2e;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: var(--font-body, 'Cormorant Garamond', Georgia, serif);
+}
+
+.pill:hover {
+  border-color: var(--gold);
   color: var(--gold);
 }
 
-.tab {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  padding: 12px 24px;
-  background: var(--dark2);
-  color: rgba(240,237,230,0.4);
-  border: none;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-.tab:hover { background: rgba(245,197,24,0.15); color: var(--gold); }
-.tabActive {
+.pillActive {
   background: var(--gold) !important;
-  color: var(--black) !important;
+  border-color: var(--gold) !important;
+  color: var(--bg) !important;
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 2px;
-}
-
-.card {
-  background: var(--black);
-  padding: 32px 28px;
+/* ── Loading ───────────────────────────────────────────────── */
+.loading {
   position: relative;
-  transition: all 0.3s;
-  border-left: 2px solid transparent;
-  color: var(--light);
+  z-index: 10;
+  text-align: center;
+  font-size: 0.62rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color:#1a1a2e;
+  margin-bottom: 24px;
 }
-.card:hover {
-  background: #1d275f;
-  border-left-color: var(--gold);
+
+/* ════════════════════════════════════════════════════════════
+   TRUE 360° Carousel — Rotating Drum Architecture
+   
+   How it works:
+   1. .stage sets up the perspective (the camera)
+   2. .drum is the actual 3D cylinder sitting inside the stage.
+      It rotates on its Y axis. All cards are children of .drum.
+   3. Each .card is fixed at its angular slot via:
+        rotateY(slotAngle) translateZ(--drum-radius)
+      Cards never move — only the drum rotates.
+   4. Cards facing away from camera (behind the drum) are 
+      darkened via brightness/opacity CSS on :not(.cardActive).
+════════════════════════════════════════════════════════════ */
+
+/* Stage — perspective camera */
+.stage {
+  position: relative;
+  z-index: 10;
+  width: min(98vw, 1100px);
+  height: 360px;
+  margin: 0 auto;
+
+  /* Perspective — distance from viewer to the z=0 plane */
+  perspective: 1200px;
+  perspective-origin: 50% 42%;
+}
+
+/* Ground shadow below stage */
+.stage::after {
+  content: '';
+  position: absolute;
+  bottom: -18px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 65%;
+  height: 28px;
+  background: radial-gradient(ellipse, rgba(0,0,0,0.12) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Drum — the rotating 3D cylinder */
+.drum {
+  position: absolute;
+  /* Center the drum origin at the stage center */
+  top: 0;
+  left: 50%;
+  margin-left: 0;
+  width: 0;   /* zero-width anchor: cards extend outward via translateZ */
+  height: 100%;
+
+  transform-style: preserve-3d;
+  transform-origin: center center;
+
+  /* Smooth 360° rotation — easing matches a physical spin */
+  transition: transform var(--trans) cubic-bezier(0.76, 0, 0.24, 1);
+
+  cursor: grab;
+  user-select: none;
+}
+
+.drum:active {
+  cursor: grabbing;
+}
+
+/* ── Card ──────────────────────────────────────────────────── */
+.card {
+  position: absolute;
+  width: var(--card-w);
+  height: var(--card-h);
+  top: 30px;
+  /* Offset so the card is centered on the drum origin */
+  left: calc(var(--card-w) / -2);
+  border-radius: 18px;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  cursor: default;
+  will-change: transform, opacity, filter;
+  
+  /*
+   * No transition on transform here —
+   * the drum parent handles the spin transition.
+   * We DO transition opacity/filter/box-shadow for the
+   * active-card highlight effect.
+   */
+  transition:
+    opacity   var(--trans) ease,
+    filter    var(--trans) ease,
+    box-shadow var(--trans) ease;
+
+  /* Cards that aren't active: dim & desaturate */
+  opacity: 0.35;
+  filter: brightness(0.35) saturate(0.4);
+  box-shadow: none;
+}
+
+/* Active card */
+.cardActive {
+  opacity: 1;
+  filter: none;
+  cursor: pointer;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.25), 0 0 0 1px rgba(201,168,76,0.25);
+}
+
+/* Gold ring on active */
+.cardActive::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  border: 1px solid rgba(201, 168, 76, 0.32);
+  box-shadow:
+    0 0 50px rgba(201, 168, 76, 0.07) inset,
+    0 16px 50px rgba(0, 0, 0, 0.18);
+  pointer-events: none;
+  z-index: 3;
+}
+
+.cardInner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.cardImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  pointer-events: none;
+  transform: scale(1);
+  transition: transform 6s linear;
+}
+
+/* Slow Ken Burns on active card */
+.cardActive .cardImage {
+  transform: scale(1.07);
+}
+
+/* ── Card Caption (active only) ─────────────────────────────── */
+.cardCaption {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(10, 20, 60, 0.92) 0%,
+    rgba(15, 30, 80, 0.45) 48%,
+    transparent 100%
+  );
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 26px 22px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+  z-index: 2;
+}
+
+.cardActive .cardCaption {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.cardTag {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.3em;
+  color: var(--gold);
+  margin-bottom: 5px;
+}
+
+.cardTitle {
+  font-family: var(--font-display, 'Cinzel', 'Georgia', serif);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  line-height: 1.1;
+  color: #f0ece4;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+}
+
+.cardDesc {
+  font-size: 0.78rem;
+  color: rgba(240, 236, 228, 0.75);
+  margin-top: 6px;
+  line-height: 1.55;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ── Controls ──────────────────────────────────────────────── */
+.controls {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 120px 10vw 40px;
+  width: 100%;
+}
+
+.arrowBtn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(201, 168, 76, 0.3);
+  background: transparent;
+  font-size: 16px;
+  color: var(--gold);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  flex-shrink: 0;
+}
+
+.arrowBtn:hover {
+  background: rgba(201, 168, 76, 0.1);
+  border-color: var(--gold);
+}
+
+/* ── Progress Pips ─────────────────────────────────────────── */
+.progressRing {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.pip {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: rgba(242, 237, 230, 0.22);
+  transition: all 0.4s ease;
+  cursor: pointer;
+}
+
+.pipActive {
+  background: var(--gold);
+  width: 18px;
+  border-radius: 3px;
+}
+
+
+/* ── View All Button ───────────────────────────────────────── */
+.viewAllWrap {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+  padding: 28px 24px 60px;
+}
+
+.viewAllBtn {
+  font-family: var(--font-body, 'Cormorant Garamond', Georgia, serif);
+  font-size: 13px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 13px 40px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(201, 168, 76, 0.5);
+  background: transparent;
+  color: var(--gold);
+  cursor: pointer;
+  transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
+}
+
+.viewAllBtn:hover {
+  background: var(--gold);
+  color: var(--bg);
+  border-color: var(--gold);
+}
+
+/* ════════════════════════════════════════════════════════════
+   Modal Lightbox
+════════════════════════════════════════════════════════════ */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 4, 10, 0.88);
+  backdrop-filter: blur(8px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.modalCard {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid rgba(201, 168, 76, 0.2);
+  border-radius: 24px;
+  overflow: hidden;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7), 0 0 60px rgba(201, 168, 76, 0.05) inset;
+  animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.modalClose {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 10;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  background: rgba(7, 8, 13, 0.8);
+  backdrop-filter: blur(6px);
+  font-size: 14px;
+  color: var(--gold);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.modalClose:hover {
+  background: rgba(201, 168, 76, 0.15);
+  border-color: var(--gold);
+}
+
+.modalBody {
+  padding: 32px 28px 36px;
+}
+
+.modalBadge {
+  display: inline-block;
+  background: rgba(201, 168, 76, 0.1);
+  border: 1px solid rgba(201, 168, 76, 0.25);
+  border-radius: 999px;
+  padding: 4px 14px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-family: var(--font-mono, 'Courier New', monospace);
+  margin-bottom: 16px;
+}
+
+.modalName {
+  font-family: var(--font-display, 'Cinzel', 'Georgia', serif);
+  font-size: 22px;
+  font-weight: 600;
+  color: #e8e0d4;
+  margin: 0 0 14px;
+  line-height: 1.3;
+  letter-spacing: 0.04em;
+}
+
+.modalDetail {
+  font-size: 14px;
+  line-height: 1.8;
+  color: rgba(200, 195, 215, 0.7);
+  margin: 0 0 28px;
+}
+
+/* Badge used in carousel cards (grid view) */
+.badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(7, 8, 13, 0.72);
+  backdrop-filter: blur(6px);
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-family: var(--font-mono, 'Courier New', monospace);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+  border: 1px solid rgba(201, 168, 76, 0.2);
+}
+
+/* ── Image fallback ────────────────────────────────────────── */
+.imageFallback {
+  width: 100%;
+  height: 100%;
+  background: #0d0f18;
+  display: grid;
+  place-items: center;
+  color: rgba(201, 168, 76, 0.3);
+}
+
+/* ════════════════════════════════════════════════════════════
+   All Products Page
+════════════════════════════════════════════════════════════ */
+.allProductsPage {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  padding: 0 0 60px;
+}
+
+.allPageHeader {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 0 10vw 32px;
+}
+
+.backBtn {
+  margin-top: 6px;
+  font-size: 13px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 9px 20px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(201, 168, 76, 0.3);
+  background: transparent;
+  color: var(--gold);
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background 0.2s ease, border-color 0.2s ease;
+  font-family: var(--font-body, 'Cormorant Garamond', Georgia, serif);
+}
+
+.backBtn:hover {
+  background: rgba(201, 168, 76, 0.1);
+  border-color: var(--gold);
+}
+
+.allPageTitleBlock {
+  display: flex;
+  flex-direction: column;
+}
+
+/* All-products grid */
+.allGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 16px;
+  padding: 0 10vw;
+}
+
+.gridCard {
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--surface);
+  border: 1px solid rgba(201, 168, 76, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.gridCard:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5);
+  border-color: rgba(201, 168, 76, 0.25);
+}
+
+.gridImageWrap {
+  position: relative;
+  overflow: hidden;
+  height: 200px;
 }
 
 .image {
   width: 100%;
-  height: 160px;
+  height: 100%;
   object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 14px;
+  display: block;
+  transition: transform 0.4s ease;
 }
 
-.imageFallback {
-  height: 160px;
-  border-radius: 8px;
-  margin-bottom: 14px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px dashed rgba(245, 197, 24, 0.5);
-  display: grid;
-  place-items: center;
-  color: rgba(240, 237, 230, 0.65);
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.gridCard:hover .image {
+  transform: scale(1.05);
 }
 
-.name {
-  font-family: var(--font-display);
-  font-size: 18px;
-  letter-spacing: 1px;
-  margin-bottom: 8px;
-  color: var(--light);
+/* Expand hint icon */
+.tapHint {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  background: rgba(7, 8, 13, 0.7);
+  backdrop-filter: blur(6px);
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  z-index: 2;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
-.detail {
-  font-size: 12px;
-  line-height: 1.6;
-  color: rgba(240,237,230,0.45);
+.gridCard:hover .tapHint {
+  opacity: 1;
 }
 
-@media (max-width: 900px) {
-  .products { padding: 80px 24px; }
-  .grid { grid-template-columns: 1fr 1fr; }
-  .tab { font-size: 10px; padding: 10px 14px; }
-}
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  :root {
+    --drum-radius: 210px;
+    --card-w: 160px;
+    --card-h: 230px;
+  }
 
-@media (max-width: 500px) {
-  .grid { grid-template-columns: 1fr; }
+  .products {
+    padding: 60px 0 0;
+  }
+
+  .stage {
+    height: 300px;
+    perspective: 900px;
+  }
+
+  .allPageHeader {
+    flex-direction: column;
+    padding: 0 6vw 24px;
+  }
+
+  .allGrid {
+    padding: 0 6vw;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  .modalCard {
+    max-width: 100%;
+  }
 }

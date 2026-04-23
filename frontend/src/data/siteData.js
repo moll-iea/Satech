@@ -3,11 +3,12 @@
 // ─────────────────────────────────────────────
 
 export const NAV_LINKS = [
-  { label: "About",    href: "#about" },
-  { label: "Services", href: "#services" },
-  { label: "Products", href: "#products" },
-  { label: "Clients",  href: "#clients" },
-  { label: "News",     href: "#news" },
+  { label: "Products",        href: "#products" },
+  { label: "Services",        href: "#services" },
+  { label: "News",            href: "#news" },
+  { label: "Articles",        href: "#articles" },
+  { label: "Exhibitions",     href: "#exhibitions" },
+  { label: "About Us",        href: "#about" },
 ];
 
 export const HERO_STATS = [
@@ -23,12 +24,12 @@ export const MARQUEE_ITEMS = [
 ];
 
 export const VALUES = [
-  { icon: "💡", name: "Creative",       desc: "Adapting to changing market needs with innovative solutions" },
-  { icon: "⚡", name: "Proficiency",     desc: "Economical and proactive team approach" },
-  { icon: "🔒", name: "Integrity",      desc: "Transparent and faithful to commitments" },
-  { icon: "🤝", name: "Reliability",    desc: "Mutual confidence among all stakeholders" },
-  { icon: "🌱", name: "Responsibility", desc: "Committed to society and partners" },
-  { icon: "🏆", name: "Excellence",     desc: "Delivering high-quality results with continuous improvement" },
+  { icon: "💡", name: "Creative Attitude",       desc: "To adapt and provide solutions to the changing needs of the market" },
+  { icon: "⚡", name: "Proficiency",     desc: "To create an economical and pro-active team in search for solutions" },
+  { icon: "🛡️", name: "Integrity",      desc: "To guide the business and its actions by being transparent andfaithful to the principle of honoring commitments" },
+  { icon: "🤝", name: "Reliability",    desc: "To establish relationships founded on mutual confidence among shareholders, employees, customers, and society" },
+  { icon: "🌱", name: "Responsibility", desc: "To act accordingly to the commitments of the organization tosociety and its partners" },
+  { icon: "🏆", name: "Excellence",     desc: "To maintain a corporate atmosphere where people are happy and motivated to participate in activities that produce results" },
 ];
 
 export const SERVICES = [

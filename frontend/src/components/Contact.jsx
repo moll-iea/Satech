@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { CONTACT_INFO } from "../data/siteData";
 import styles from "./Contact.module.css";
 
-const INITIAL = { name: "", email: "", company: "", message: "" };
+const INITIAL = { name: "", email: "", message: "" };
 
 export default function Contact() {
   const [form, setForm]       = useState(INITIAL);
@@ -65,10 +65,6 @@ export default function Contact() {
         {/* Left: info */}
         <div className={styles.info}>
           <h2 className={styles.title}>Let's Build<br />Solutions<br />Together</h2>
-          <p className={styles.sub}>
-            Ready to find the right equipment, parts, or services solution for
-            your operation? Reach out and our team will respond promptly.
-          </p>
           <div className={styles.details}>
             {CONTACT_INFO.map((c) => (
               <div className={styles.detailItem} key={c.label}>
@@ -98,25 +94,35 @@ export default function Contact() {
           ) : (
             <form onSubmit={handleSubmit} noValidate>
               {submitError && <p className={styles.error}>{submitError}</p>}
-              {[
-                { name: "name",    type: "text",  placeholder: "Your Full Name" },
-                { name: "email",   type: "email", placeholder: "Email Address" },
-                { name: "company", type: "text",  placeholder: "Company Name (optional)" },
-              ].map((field) => (
-                <div className={styles.formGroup} key={field.name}>
-                  <input
-                    type={field.type}
-                    name={field.name}
-                    value={form[field.name]}
-                    onChange={handleChange}
-                    placeholder={field.placeholder}
-                    className={errors[field.name] ? styles.inputError : ""}
-                  />
-                  {errors[field.name] && (
-                    <span className={styles.error}>{errors[field.name]}</span>
-                  )}
-                </div>
-              ))}
+
+              <div className={styles.formGroup}>
+                <input
+                  type="text"
+                  name="name"
+                  value={form.name}
+                  onChange={handleChange}
+                  placeholder="Your Full Name"
+                  className={errors.name ? styles.inputError : ""}
+                />
+                {errors.name && (
+                  <span className={styles.error}>{errors.name}</span>
+                )}
+              </div>
+
+              <div className={styles.formGroup}>
+                <input
+                  type="email"
+                  name="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  placeholder="Email Address"
+                  className={errors.email ? styles.inputError : ""}
+                />
+                {errors.email && (
+                  <span className={styles.error}>{errors.email}</span>
+                )}
+              </div>
+
               <div className={styles.formGroup}>
                 <textarea
                   name="message"
@@ -129,6 +135,7 @@ export default function Contact() {
                   <span className={styles.error}>{errors.message}</span>
                 )}
               </div>
+
               <button type="submit" className={styles.btnDark} disabled={isSubmitting}>
                 {isSubmitting ? "Sending..." : "Send Message →"}
               </button>
