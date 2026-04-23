@@ -95,14 +95,20 @@ function CarouselCard({ product, index, total, isActive, broken, onClick, onImag
 }
 
 /* ── All Products full page ── */
-function AllProductsPage({ catalog, categories, onBack }) {
+function AllProductsPage({ catalog, categories, searchQuery, onSearchChange, onBack }) {
   const [filterCat, setFilterCat] = useState("");
   const [modalProduct, setModalProduct] = useState(null);
   const [brokenImages, setBrokenImages] = useState({});
+  const normalizedSearch = searchQuery.trim().toLowerCase();
 
   const filtered = useMemo(() => {
-    return !filterCat ? catalog : catalog.filter((p) => p.category === filterCat);
-  }, [catalog, filterCat]);
+    const byCategory = !filterCat ? catalog : catalog.filter((p) => p.category === filterCat);
+    if (!normalizedSearch) return byCategory;
+    return byCategory.filter((p) => {
+      const haystack = `${p.name} ${p.detail} ${p.category}`.toLowerCase();
+      return haystack.includes(normalizedSearch);
+    });
+  }, [catalog, filterCat, normalizedSearch]);
 
   const markBroken = (key) => setBrokenImages((prev) => ({ ...prev, [key]: true }));
 
@@ -115,6 +121,36 @@ function AllProductsPage({ catalog, categories, onBack }) {
           <h2 className={styles.heroTitle}>All <em>Products</em></h2>
         </div>
       </div>
+
+      <div className={styles.searchRow}>
+        <label className={styles.searchField}>
+          <span className={styles.searchIcon} aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="7" />
+              <path d="M20 20l-3.5-3.5" />
+            </svg>
+          </span>
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => onSearchChange(e.target.value)}
+            placeholder="Search products, categories, or details"
+            aria-label="Search products"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className={styles.searchClear}
+              onClick={() => onSearchChange("")}
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
+        </label>
+      </div>
+
+      <p className={styles.resultCount}>{filtered.length} product{filtered.length === 1 ? "" : "s"} found</p>
 
       <div className={styles.filterRow}>
         {categories.map((cat) => (
@@ -193,6 +229,7 @@ export default function Products() {
   const [loading, setLoading] = useState(true);
   const [brokenImages, setBrokenImages] = useState({});
   const [activeCategory, setActiveCategory] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const [showAllPage, setShowAllPage] = useState(false);
   const [modalProduct, setModalProduct] = useState(null);
 
@@ -241,17 +278,27 @@ export default function Products() {
 
   const categories = useMemo(() => [...new Set(catalog.map((p) => p.category))], [catalog]);
 
+  const normalizedSearch = searchQuery.trim().toLowerCase();
+
+  const filteredCatalog = useMemo(() => {
+    const byCategory = !activeCategory ? catalog : catalog.filter((p) => p.category === activeCategory);
+    if (!normalizedSearch) return byCategory;
+    return byCategory.filter((p) => {
+      const haystack = `${p.name} ${p.detail} ${p.category}`.toLowerCase();
+      return haystack.includes(normalizedSearch);
+    });
+  }, [catalog, activeCategory, normalizedSearch]);
+
   const preview = useMemo(() => {
-    const list = !activeCategory ? catalog : catalog.filter((p) => p.category === activeCategory);
-    return list.slice(0, 7);
-  }, [catalog, activeCategory]);
+    return filteredCatalog.slice(0, 7);
+  }, [filteredCatalog]);
 
   const N = preview.length;
   const anglePerCard = N > 0 ? 360 / N : 0;
 
   const totalFiltered = useMemo(() => {
-    return !activeCategory ? catalog.length : catalog.filter((p) => p.category === activeCategory).length;
-  }, [catalog, activeCategory]);
+    return filteredCatalog.length;
+  }, [filteredCatalog]);
 
   const markImageBroken = (key) => setBrokenImages((prev) => ({ ...prev, [key]: true }));
 
@@ -293,6 +340,11 @@ export default function Products() {
     setCurrent(0);
     setDrumAngle(0);
   }, [activeCategory]);
+
+  useEffect(() => {
+    setCurrent(0);
+    setDrumAngle(0);
+  }, [searchQuery]);
 
   // Start auto-play
   useEffect(() => {
@@ -345,6 +397,8 @@ export default function Products() {
         <AllProductsPage
           catalog={catalog}
           categories={categories}
+          searchQuery={searchQuery}
+          onSearchChange={setSearchQuery}
           onBack={() => setShowAllPage(false)}
         />
       </section>
@@ -381,6 +435,34 @@ export default function Products() {
         </h2>
       </div>
 
+      <div className={styles.searchRow}>
+        <label className={styles.searchField}>
+          <span className={styles.searchIcon} aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="7" />
+              <path d="M20 20l-3.5-3.5" />
+            </svg>
+          </span>
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search products, categories, or details"
+            aria-label="Search products"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className={styles.searchClear}
+              onClick={() => setSearchQuery("")}
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
+        </label>
+      </div>
+
       {/* Category filter pills */}
       <div className={styles.filterRow}>
         {categories.map((cat) => (
@@ -393,6 +475,36 @@ export default function Products() {
           </button>
         ))}
       </div>
+
+      <div className={styles.searchRow}>
+        <label className={styles.searchField}>
+          <span className={styles.searchIcon} aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="11" cy="11" r="7" />
+              <path d="M20 20l-3.5-3.5" />
+            </svg>
+          </span>
+          <input
+            type="search"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search products, categories, or details"
+            aria-label="Search products"
+          />
+          {searchQuery && (
+            <button
+              type="button"
+              className={styles.searchClear}
+              onClick={() => setSearchQuery("")}
+              aria-label="Clear search"
+            >
+              ✕
+            </button>
+          )}
+        </label>
+      </div>
+
+      <p className={styles.resultCount}>{totalFiltered} product{totalFiltered === 1 ? "" : "s"} found</p>
 
       {loading && <p className={styles.loading}>Loading products…</p>}
 
@@ -452,6 +564,10 @@ export default function Products() {
             >›</button>
           </div>
         </>
+      )}
+
+      {!loading && filteredCatalog.length === 0 && (
+        <p className={styles.emptyState}>No products match your search.</p>
       )}
 
       {/* Modal lightbox */}
