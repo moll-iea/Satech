@@ -37,7 +37,7 @@ exports.createNews = async (req, res) => {
     date: new Date(date),
     summary,
     link: link || '#',
-    imageUrl: req.file ? `http://localhost:5000/${req.file.path}` : null,  // Use req.file, not req.body
+    imageUrl: req.file ? req.file.path : null,  // ✅ Cloudinary returns full URL in req.file.path
   });
 
   try {
@@ -65,7 +65,7 @@ exports.updateNews = async (req, res) => {
     if (summary) news.summary = summary;
     if (link) news.link = link;
     if (req.file) {
-      news.imageUrl = `http://localhost:5000/${req.file.path.replace(/\\/g, '/')}`;
+      news.imageUrl = req.file.path;  // ✅ Same fix here
     }
     news.updatedAt = Date.now();
 

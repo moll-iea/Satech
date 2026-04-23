@@ -361,6 +361,7 @@ export default function AdminDashboard() {
     { id: "overview", label: "Overview", icon: "◈" },
     { id: "categories", label: "Categories", icon: "⬡" },
     { id: "products", label: "Products", icon: "▣" },
+    { id: "services", label: "Services", icon: "⚙" },
     { id: "videos", label: "Videos", icon: "▶" },
     { id: "inquiries", label: "Inquiries", icon: "⌁" },
   ];
@@ -1141,6 +1142,11 @@ export default function AdminDashboard() {
                 ))}
               </div>
             </div>
+          )}
+
+          {/* SERVICES TAB */}
+          {!isLoading && !error && activeTab === "services" && (
+            <ServiceAdmin />
           )}
         </div>
 

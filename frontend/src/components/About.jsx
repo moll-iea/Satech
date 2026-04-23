@@ -73,21 +73,20 @@ export default function About() {
       <div className={styles.text}>
         <div className={`${styles.sectionTag} reveal`}>// Who We Are</div>
         <h2 className={`${styles.sectionTitle} reveal`}>
-          We Create<br />
-          <span className={styles.gold}>Values</span>
+          We Create <span className={styles.gold}>Values</span>
         </h2>
         <div className={styles.divider} />
         <p className={`${styles.bodyText} reveal`}>
-          SATECH is a solutions provider with more than 30 years of experience
-          in the SMT and Semiconductor business worldwide. We connect suppliers
-          and end-users across Electronics, Semiconductors, Medical, Automotive,
-          Pharmaceutical, Food, and Machine Industries.
+          To create solutions in the Manufacturing Industry, 
+          particularly;Electronics, Semiconductors, Medical, 
+          Automotive, Pharmaceutical, Foodand Machine Industries, 
+          connecting suppliers and end-users
         </p>
         <p className={`${styles.bodyText} reveal`}>
-          Our highly skilled, factory-trained professionals deliver technical
-          expertise 24/7, backed by deep knowledge in Electronics, Computers,
-          Automotive, and Mechanical fields — with capability for re-engineering,
-          design, repair, fabrication, and assembly.
+          Through values that define its culture, 
+          added to a complete set of services, 
+          Satech stands as A STRATEGIC PARTNER IN PROVIDING EQUIPMENT,
+           PARTS AND SERVICES SOLUTIONS
         </p>
       </div>
 
@@ -96,7 +95,6 @@ export default function About() {
         <div className={styles.box}>
           <div className={styles.boxHeader}>
             <div className={styles.boxTitle}>Core Values</div>
-            <div className={styles.boxVersion}>REV 3.0</div>
           </div>
 
           <div className={styles.valuesGrid}>

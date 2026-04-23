@@ -34,7 +34,7 @@ export default function Global() {
     <section className={styles.global} id="news" ref={ref}>
       {/* Header */}
       <div className={styles.header}>
-        <div className="section-tag">// News & Articles</div>
+        <div className="section-tag">// News</div>
         <h2 className={styles.title}>Latest Updates</h2>
         <p className={styles.desc}>
           SATECH announcements, event highlights, and industry insights.
@@ -53,13 +53,13 @@ export default function Global() {
           </button>
         ))}
         <span className={styles.filterCount}>
-          {filtered.length} article{filtered.length !== 1 ? "s" : ""}
+          {filtered.length} news item{filtered.length !== 1 ? "s" : ""}
         </span>
       </div>
 
       {/* Grid */}
       {loading ? (
-        <div className={styles.loading}>Loading articles...</div>
+        <div className={styles.loading}>Loading news...</div>
       ) : (
         <div className={styles.cardGrid}>
           {filtered.map((item) => (
@@ -102,7 +102,7 @@ export default function Global() {
           ))}
 
           {filtered.length === 0 && (
-            <div className={styles.empty}>No articles in this category yet.</div>
+            <div className={styles.empty}>No news in this category yet.</div>
           )}
         </div>
       )}

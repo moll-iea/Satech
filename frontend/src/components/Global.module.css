@@ -1,7 +1,7 @@
 /* ─── Section wrapper ───────────────────────────────────────── */
 .global {
   background: var(--dark);
-  padding: 100px 60px;
+  padding: 80px 40px;
   display: flex;
   flex-direction: column;
   gap: 48px;
@@ -82,7 +82,7 @@
 .cardGrid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  gap: 8px;
 }
 
 /* ─── Individual card ───────────────────────────────────────── */
@@ -107,7 +107,7 @@
 .cardImageWrap {
   position: relative;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 16 / 7;
   overflow: hidden;
   background: var(--dark2);
   flex-shrink: 0;
@@ -157,18 +157,18 @@
 
 /* ─── Card body ─────────────────────────────────────────────── */
 .cardBody {
-  padding: 18px 20px 20px;
+  padding: 8px 12px 12px;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   flex: 1;
 }
 
 .cardTitle {
   font-family: var(--font-display);
-  font-size: 14px;
-  font-weight: 600;
-  color: rgba(240, 237, 230, 0.9);
+  font-size: 20px;          /* was 12px */
+  font-weight: 400;          /* was 600 */
+  color: rgba(240, 237, 230, 0.88);
   margin: 0;
   line-height: 1.5;
   display: -webkit-box;

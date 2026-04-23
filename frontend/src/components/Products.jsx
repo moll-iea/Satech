@@ -10,7 +10,7 @@ const resolveImageUrl = (imagePath) => {
   return `${baseUrl}${imagePath.startsWith("/") ? imagePath : `/${imagePath}`}`;
 };
 
-const INITIAL_LIMIT = 5;
+const TRANSITION = 900; // ms — must match CSS --trans
 
 /* ── Fallback SVG ── */
 function ImageFallback() {
@@ -26,7 +26,8 @@ function ImageFallback() {
 }
 
 /* ── Modal lightbox ── */
-function ProductModal({ product, broken, onImageError, onClose }) {
+function ProductModal({ product, onClose }) {
+
   useEffect(() => {
     const handler = (e) => { if (e.key === "Escape") onClose(); };
     document.addEventListener("keydown", handler);
@@ -41,20 +42,8 @@ function ProductModal({ product, broken, onImageError, onClose }) {
     <div className={styles.modalBackdrop} onClick={onClose}>
       <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
         <button className={styles.modalClose} onClick={onClose} aria-label="Close">✕</button>
-        <div className={styles.modalImageWrap}>
-          {product.image && !broken ? (
-            <img
-              className={styles.modalImage}
-              src={product.image}
-              alt={product.name}
-              onError={onImageError}
-            />
-          ) : (
-            <ImageFallback />
-          )}
-          <span className={styles.badge}>{product.category}</span>
-        </div>
         <div className={styles.modalBody}>
+          <span className={styles.modalBadge}>{product.category}</span>
           <h3 className={styles.modalName}>{product.name}</h3>
           <p className={styles.modalDetail}>{product.detail}</p>
         </div>
@@ -63,32 +52,70 @@ function ProductModal({ product, broken, onImageError, onClose }) {
   );
 }
 
+/* ── 3D Carousel Card ──
+   Cards are pre-positioned on the cylinder via rotateY + translateZ.
+   The DRUM (parent) rotates — this is the true 360° approach.
+── */
+function CarouselCard({ product, index, total, isActive, broken, onClick, onImageError }) {
+  // Each card is placed at its fixed slot on the cylinder
+  const anglePerCard = 360 / total;
+  const cardAngle = index * anglePerCard;
+
+  const cardStyle = {
+    // Pre-place card on the cylinder face
+    transform: `rotateY(${cardAngle}deg) translateZ(var(--drum-radius))`,
+  };
+
+  return (
+    <div
+      className={`${styles.card} ${isActive ? styles.cardActive : ""}`}
+      style={cardStyle}
+      onClick={isActive ? onClick : undefined}
+      title={isActive ? "Click to enlarge" : undefined}
+    >
+      <div className={styles.cardInner}>
+        {product.image && !broken ? (
+          <img
+            className={styles.cardImage}
+            src={product.image}
+            alt={product.name}
+            loading="lazy"
+            onError={onImageError}
+          />
+        ) : (
+          <ImageFallback />
+        )}
+        <div className={styles.cardCaption}>
+          <div className={styles.cardTag}>{product.category}</div>
+          <div className={styles.cardTitle}>{product.name}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 /* ── All Products full page ── */
 function AllProductsPage({ catalog, categories, onBack }) {
-  const [filterCat, setFilterCat] = useState("All");
+  const [filterCat, setFilterCat] = useState("");
   const [modalProduct, setModalProduct] = useState(null);
   const [brokenImages, setBrokenImages] = useState({});
 
   const filtered = useMemo(() => {
-    return filterCat === "All" ? catalog : catalog.filter((p) => p.category === filterCat);
+    return !filterCat ? catalog : catalog.filter((p) => p.category === filterCat);
   }, [catalog, filterCat]);
 
   const markBroken = (key) => setBrokenImages((prev) => ({ ...prev, [key]: true }));
 
   return (
     <div className={styles.allProductsPage}>
-      {/* Header */}
       <div className={styles.allPageHeader}>
-        <button className={styles.backBtn} onClick={onBack}>
-          ← Back
-        </button>
+        <button className={styles.backBtn} onClick={onBack}>← Back</button>
         <div className={styles.allPageTitleBlock}>
           <span className={styles.eyebrow}>Full Catalogue</span>
           <h2 className={styles.heroTitle}>All <em>Products</em></h2>
         </div>
       </div>
 
-      {/* Category filter */}
       <div className={styles.filterRow}>
         {categories.map((cat) => (
           <button
@@ -101,7 +128,6 @@ function AllProductsPage({ catalog, categories, onBack }) {
         ))}
       </div>
 
-      {/* Grid */}
       <div className={styles.allGrid}>
         {filtered.map((p) => {
           const key = `${p.category}-${p.name}`;
@@ -137,12 +163,9 @@ function AllProductsPage({ catalog, categories, onBack }) {
         })}
       </div>
 
-      {/* Modal */}
       {modalProduct && (
         <ProductModal
           product={modalProduct}
-          broken={brokenImages[modalProduct.key]}
-          onImageError={() => markBroken(modalProduct.key)}
           onClose={() => setModalProduct(null)}
         />
       )}
@@ -151,18 +174,38 @@ function AllProductsPage({ catalog, categories, onBack }) {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   Main Products component
+   Main Products component — TRUE 360° Rotating Drum Carousel
+   
+   Architecture (matches the 3D Marvel Carousel pattern):
+   
+   <stage>                          ← perspective camera
+     <drum style="rotateY(Ndeg)">  ← THE WHOLE CYLINDER ROTATES
+       <card style="rotateY(0deg)  translateZ(R)">   slot 0
+       <card style="rotateY(51deg) translateZ(R)">   slot 1
+       ...                          ← cards are FIXED on the drum
+     </drum>
+   </stage>
+   
+   To advance: drumRotation -= anglePerCard  (CSS transition handles the spin)
 ══════════════════════════════════════════════════════════════ */
 export default function Products() {
   const [apiProducts, setApiProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [brokenImages, setBrokenImages] = useState({});
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [scrollProgress, setScrollProgress] = useState(0);
+  const [activeCategory, setActiveCategory] = useState("");
   const [showAllPage, setShowAllPage] = useState(false);
   const [modalProduct, setModalProduct] = useState(null);
-  const trackRef = useRef(null);
+
+  // 360° drum state — drumAngle is the Y rotation applied to the whole drum
+  const [current, setCurrent] = useState(0);
+  const [drumAngle, setDrumAngle] = useState(0); // cumulative degrees (never wraps — allows smooth infinite spin)
+  const [busy, setBusy] = useState(false);
+  const timerRef = useRef(null);
+  const touchXRef = useRef(0);
+  const dragRef = useRef(null);   // for mouse drag support
   const ref = useScrollReveal();
+
+  const INTERVAL = 3200;
 
   useEffect(() => {
     const loadProducts = async () => {
@@ -196,38 +239,103 @@ export default function Products() {
     );
   }, [apiProducts]);
 
-  const categories = useMemo(() => ["All", ...new Set(catalog.map((p) => p.category))], [catalog]);
+  const categories = useMemo(() => [...new Set(catalog.map((p) => p.category))], [catalog]);
 
   const preview = useMemo(() => {
-    const list = activeCategory === "All" ? catalog : catalog.filter((p) => p.category === activeCategory);
-    return list.slice(0, INITIAL_LIMIT);
+    const list = !activeCategory ? catalog : catalog.filter((p) => p.category === activeCategory);
+    return list.slice(0, 7);
   }, [catalog, activeCategory]);
 
+  const N = preview.length;
+  const anglePerCard = N > 0 ? 360 / N : 0;
+
   const totalFiltered = useMemo(() => {
-    return activeCategory === "All" ? catalog.length : catalog.filter((p) => p.category === activeCategory).length;
+    return !activeCategory ? catalog.length : catalog.filter((p) => p.category === activeCategory).length;
   }, [catalog, activeCategory]);
 
   const markImageBroken = (key) => setBrokenImages((prev) => ({ ...prev, [key]: true }));
 
-  const handleScroll = useCallback(() => {
-    const el = trackRef.current;
-    if (!el) return;
-    const max = el.scrollWidth - el.clientWidth;
-    setScrollProgress(max > 0 ? el.scrollLeft / max : 0);
+  // Advance the drum — uses cumulative angle so it spins smoothly without wrapping
+  const advance = useCallback((dir = 1) => {
+    if (busy || N === 0) return;
+    setBusy(true);
+    setCurrent((prev) => (prev + dir + N) % N);
+    setDrumAngle((prev) => prev - dir * anglePerCard);
+    setTimeout(() => setBusy(false), TRANSITION);
+  }, [busy, N, anglePerCard]);
+
+  // Jump to a specific index (for pip clicks)
+  const jumpTo = useCallback((idx) => {
+    if (busy || N === 0 || idx === current) return;
+    setBusy(true);
+    // Find shortest arc
+    let delta = idx - current;
+    if (delta > N / 2) delta -= N;
+    if (delta < -N / 2) delta += N;
+    setCurrent(idx);
+    setDrumAngle((prev) => prev - delta * anglePerCard);
+    setTimeout(() => setBusy(false), TRANSITION);
+  }, [busy, N, current, anglePerCard]);
+
+  // Auto-play
+  const startTimer = useCallback(() => {
+    if (timerRef.current) return;
+    timerRef.current = setInterval(() => advance(1), INTERVAL);
+  }, [advance]);
+
+  const stopTimer = useCallback(() => {
+    clearInterval(timerRef.current);
+    timerRef.current = null;
   }, []);
 
-  const scroll = (dir) => {
-    const el = trackRef.current;
-    if (!el) return;
-    el.scrollBy({ left: dir * 340, behavior: "smooth" });
+  // Reset carousel when category changes
+  useEffect(() => {
+    setCurrent(0);
+    setDrumAngle(0);
+  }, [activeCategory]);
+
+  // Start auto-play
+  useEffect(() => {
+    startTimer();
+    return () => stopTimer();
+  }, [startTimer, stopTimer]);
+
+  // Touch swipe
+  const handleTouchStart = (e) => {
+    touchXRef.current = e.touches[0].clientX;
+    stopTimer();
   };
 
-  const handleScrubClick = (e) => {
-    const el = trackRef.current;
-    if (!el) return;
+  const handleTouchEnd = (e) => {
+    const dx = e.changedTouches[e.changedTouches.length - 1].clientX - touchXRef.current;
+    if (Math.abs(dx) > 48) {
+      advance(dx < 0 ? 1 : -1);
+    }
+    startTimer();
+  };
+
+  // Mouse drag support
+  const handleMouseDown = (e) => {
+    dragRef.current = e.clientX;
+    stopTimer();
+  };
+
+  const handleMouseUp = (e) => {
+    if (dragRef.current !== null) {
+      const dx = e.clientX - dragRef.current;
+      if (Math.abs(dx) > 48) advance(dx < 0 ? 1 : -1);
+      dragRef.current = null;
+    }
+    startTimer();
+  };
+
+  // Interactive mouse-tracking spotlight
+  const handleMouseMove = (e) => {
     const rect = e.currentTarget.getBoundingClientRect();
-    const ratio = (e.clientX - rect.left) / rect.width;
-    el.scrollLeft = ratio * (el.scrollWidth - el.clientWidth);
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    e.currentTarget.style.setProperty("--mx", `${x}%`);
+    e.currentTarget.style.setProperty("--my", `${y}%`);
   };
 
   /* ── Render all-products page ── */
@@ -243,8 +351,27 @@ export default function Products() {
     );
   }
 
+  // The drum CSS transform — rotates the entire cylinder
+  const drumStyle = {
+    transform: `rotateX(-16deg) rotateY(${drumAngle}deg)`,
+  };
+
   return (
-    <section className={styles.products} id="products" ref={ref}>
+    <section className={styles.products} id="products" ref={ref} onMouseMove={handleMouseMove}>
+      {/* Atmospheric background orbs */}
+      <div className={`${styles.bgOrb} ${styles.orb1}`} />
+      <div className={`${styles.bgOrb} ${styles.orb2}`} />
+      <div className={`${styles.bgOrb} ${styles.orb3}`} />
+      <div className={styles.noise} />
+      {/* Interactive grid lines */}
+      <div className={styles.gridLines} aria-hidden="true" />
+      {/* Mouse-follow spotlight */}
+      <div className={styles.spotlight} aria-hidden="true" />
+      {/* Floating particles */}
+      {[...Array(6)].map((_, i) => (
+        <div key={i} className={`${styles.particle} ${styles['p' + (i + 1)]}`} aria-hidden="true" />
+      ))}
+
       {/* Hero header */}
       <div className={styles.heroHeader}>
         <span className={styles.eyebrow}>Product Catalogue</span>
@@ -269,69 +396,68 @@ export default function Products() {
 
       {loading && <p className={styles.loading}>Loading products…</p>}
 
-      {/* Carousel */}
-      <div className={styles.carouselOuter}>
-        <div className={styles.carouselTrack} ref={trackRef} onScroll={handleScroll}>
-          {preview.map((p, i) => {
-            const key = `${p.category}-${p.name}`;
-            const broken = brokenImages[key];
-            const isFeatured = i % 5 === 2;
-            return (
-              <div
-                key={key}
-                className={`${styles.card} ${isFeatured ? styles.cardFeatured : ""}`}
-                onClick={() => setModalProduct({ ...p, key })}
-                title="Click to enlarge"
-              >
-                <div className={styles.imageWrap}>
-                  {p.image && !broken ? (
-                    <img
-                      className={styles.image}
-                      src={p.image}
-                      alt={p.name}
-                      loading="lazy"
-                      onError={() => markImageBroken(key)}
-                    />
-                  ) : (
-                    <ImageFallback />
-                  )}
-                  <span className={styles.badge}>{p.category}</span>
-                  <div className={styles.tapHint}>
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7" />
-                    </svg>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      {/* 3D Carousel Stage */}
+      {!loading && preview.length > 0 && (
+        <>
+          {/* Stage: perspective camera */}
+          <div className={styles.stage}>
+            {/* Drum: the cylinder that rotates */}
+            <div
+              className={styles.drum}
+              style={drumStyle}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}
+            >
+              {preview.map((p, i) => {
+                const key = `${p.category}-${p.name}`;
+                const isActive = i === current;
+                return (
+                  <CarouselCard
+                    key={key}
+                    product={p}
+                    index={i}
+                    total={N}
+                    isActive={isActive}
+                    broken={brokenImages[key]}
+                    onClick={() => setModalProduct({ ...p, key })}
+                    onImageError={() => markImageBroken(key)}
+                  />
+                );
+              })}
+            </div>
+          </div>
 
-      {/* Arrow + scrubber controls */}
-      <div className={styles.controls}>
-        <button className={styles.arrowBtn} onClick={() => scroll(-1)} aria-label="Previous">←</button>
-        <div className={styles.scrubber} onClick={handleScrubClick}>
-          <div className={styles.scrubberThumb} style={{ left: `${scrollProgress * 100}%` }} />
-        </div>
-        <button className={styles.arrowBtn} onClick={() => scroll(1)} aria-label="Next">→</button>
-      </div>
-
-      {/* View All Products button */}
-      {totalFiltered > INITIAL_LIMIT && (
-        <div className={styles.viewAllWrap}>
-          <button className={styles.viewAllBtn} onClick={() => setShowAllPage(true)}>
-            View All Products ({totalFiltered})
-          </button>
-        </div>
+          {/* Arrow controls */}
+          <div className={styles.controls}>
+            <button
+              className={styles.arrowBtn}
+              onClick={() => { stopTimer(); advance(-1); startTimer(); }}
+              aria-label="Previous"
+            >‹</button>
+            <div className={styles.progressRing}>
+              {preview.map((_, i) => (
+                <span
+                  key={i}
+                  className={`${styles.pip} ${i === current ? styles.pipActive : ""}`}
+                  onClick={() => { stopTimer(); jumpTo(i); startTimer(); }}
+                />
+              ))}
+            </div>
+            <button
+              className={styles.arrowBtn}
+              onClick={() => { stopTimer(); advance(1); startTimer(); }}
+              aria-label="Next"
+            >›</button>
+          </div>
+        </>
       )}
 
       {/* Modal lightbox */}
       {modalProduct && (
         <ProductModal
           product={modalProduct}
-          broken={brokenImages[modalProduct.key]}
-          onImageError={() => markImageBroken(modalProduct.key)}
           onClose={() => setModalProduct(null)}
         />
       )}

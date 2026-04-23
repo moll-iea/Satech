@@ -1,7 +1,7 @@
 .footer {
   background: var(--dark);
   border-top: 1px solid rgba(245,197,24,0.1);
-  padding: 40px 60px;
+  padding: 20px 60px;
   display: flex;
   justify-content: space-between;
   align-items: center;
