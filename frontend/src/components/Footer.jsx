@@ -7,13 +7,13 @@ export default function Footer() {
     <footer className={styles.footer}>
       <div className={styles.logo}>SATECH INC.</div>
       <div className={styles.copy}>
-        © {new Date().getFullYear()} SA TECH INC. All rights reserved. The Solutions Provider.
+        © {new Date().getFullYear()} SATECH INC. All rights reserved. The Solutions Provider.
       </div>
-      <div className={styles.links}>
+      {/* <div className={styles.links}>
         {NAV_LINKS.map((l) => (
           <a href={l.href} key={l.href}>{l.label}</a>
         ))}
-      </div>
+      </div> */}
     </footer>
   );
 }

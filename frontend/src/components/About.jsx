@@ -71,7 +71,7 @@ export default function About() {
 
       {/* Left: text */}
       <div className={styles.text}>
-        <div className={`${styles.sectionTag} reveal`}>// Who We Are</div>
+        <div className={`${styles.sectionTag} reveal`}>Who We Are</div>
         <h2 className={`${styles.sectionTitle} reveal`}>
           We Create <span className={styles.gold}>Values</span>
         </h2>

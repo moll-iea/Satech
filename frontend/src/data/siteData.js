@@ -5,8 +5,7 @@
 export const NAV_LINKS = [
   { label: "Products",        href: "#products" },
   { label: "Services",        href: "#services" },
-  { label: "News",            href: "#news" },
-  { label: "Articles",        href: "#articles" },
+  { label: "News & Articles",            href: "#news" },
   { label: "Exhibitions",     href: "#exhibitions" },
   { label: "About Us",        href: "#about" },
 ];
@@ -18,9 +17,11 @@ export const HERO_STATS = [
 ];
 
 export const MARQUEE_ITEMS = [
-  "SMT Solutions", "Semiconductor", "Automation",
-  "Automotive", "Inspection Systems", "Lab Equipment",
-  "Technical Support", "Factory Automation",
+  "Automotive", "Aerospace", "Digital",
+  "Electronics", "Foods", "Pharmaceutical",
+  "Laboratories", "Logistics", "Machine Shops",
+  "Maritime", "Medical", "Mining",
+  "Power Generation", "Semiconductors", "Telecommunications",
 ];
 
 export const VALUES = [

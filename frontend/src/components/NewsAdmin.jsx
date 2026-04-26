@@ -43,6 +43,7 @@ const matchesSearch = (item, term) => {
     item.title?.toLowerCase().includes(searchLower) ||
     item.category?.toLowerCase().includes(searchLower) ||
     item.summary?.toLowerCase().includes(searchLower) ||
+    item.author?.toLowerCase().includes(searchLower) ||
     new Date(item.date).toLocaleDateString().includes(searchLower)
   );
 };
@@ -57,7 +58,7 @@ export default function NewsAdmin() {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    title: '', category: '', date: '', summary: '', link: '', image: null,
+    title: '', category: '', date: '', summary: '', link: '', source: '', author: '', image: null,
   });
   const [imagePreview, setImagePreview] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -89,7 +90,7 @@ export default function NewsAdmin() {
   // ── Moved inside component so they can access `news` state ──
 
   const handleCancel = () => {
-    setFormData({ title: '', category: '', date: '', summary: '', link: '', image: null });
+    setFormData({ title: '', category: '', date: '', summary: '', link: '', source: '', author: '', image: null });
     setImagePreview("");
     setShowForm(false);
     setEditingId(null);
@@ -169,7 +170,7 @@ export default function NewsAdmin() {
       if (editingId) await newsService.update(editingId, data);
       else await newsService.create(data);
       toast.success(editingId ? 'Article updated successfully!' : 'Article created successfully!');
-      setFormData({ title: '', category: '', date: '', summary: '', link: '', image: null });
+      setFormData({ title: '', category: '', date: '', summary: '', link: '', source: '', author: '', image: null });
       setImagePreview(""); setEditingId(null); setShowForm(false);
       await fetchNews();
     } catch (err) { 
@@ -181,7 +182,7 @@ export default function NewsAdmin() {
 
   const handleEdit = (item) => {
     const dateStr = new Date(item.date).toISOString().split('T')[0];
-    setFormData({ title: item.title, category: item.category, date: dateStr, summary: item.summary, link: item.link || '', image: null });
+    setFormData({ title: item.title, category: item.category, date: dateStr, summary: item.summary, link: item.link || '', source: item.source || '', author: item.author || '', image: null });
     setImagePreview(item.imageUrl || "");
     setEditingId(item._id);
     setShowForm(true);
@@ -229,7 +230,7 @@ export default function NewsAdmin() {
           />
           {/* <button onClick={downloadPDF} className={styles.downloadBtn}>📄 PDF</button>
           <button onClick={downloadExcel} className={styles.downloadBtn}>📊 Excel</button> */}
-          <button onClick={() => { setShowForm(true); setEditingId(null); setImagePreview(""); setFormData({ title: '', category: '', date: '', summary: '', link: '', image: null }); }}
+          <button onClick={() => { setShowForm(true); setEditingId(null); setImagePreview(""); setFormData({ title: '', category: '', date: '', summary: '', link: '', source: '', author: '', image: null }); }}
             className={styles.addBtn}>
             ⊕ New Article
           </button>
@@ -303,6 +304,16 @@ export default function NewsAdmin() {
                   <input type="text" name="link" value={formData.link} onChange={handleInputChange} placeholder="https://..." />
                 </div>
 
+                <div className={styles.fieldGroup}>
+                  <label>Source</label>
+                  <input type="text" name="source" value={formData.source} onChange={handleInputChange} placeholder="e.g., Reuters, Bloomberg, etc." />
+                </div>
+
+                <div className={styles.fieldGroup}>
+                  <label>Author</label>
+                  <input type="text" name="author" value={formData.author} onChange={handleInputChange} placeholder="Article author..." />
+                </div>
+
                 <div className={styles.formActions}>
                   <button type="submit" className={styles.submitBtn} disabled={submitting}>
                     {submitting ? '⟳ Saving...' : (editingId ? 'Save Changes' : 'Publish Article')}
@@ -373,6 +384,8 @@ export default function NewsAdmin() {
                       <span className={styles.articleDate}>{new Date(item.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}</span>
                       {item.link && <a href={item.link} target="_blank" rel="noopener noreferrer" className={styles.articleLink}>↗ Link</a>}
                     </div>
+                    {item.source && <span className={styles.articleSource}>{item.source}</span>}
+                    {item.author && <span className={styles.articleSource} style={{ fontSize: "0.75rem", color: "#7ab0c0" }}>By {item.author}</span>}
                     <h3 className={styles.articleTitle}>{item.title}</h3>
                     <p className={styles.articleSummary}>{item.summary?.substring(0, 90)}{item.summary?.length > 90 ? '...' : ''}</p>
                   </div>

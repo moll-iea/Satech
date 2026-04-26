@@ -22,7 +22,7 @@ function VideosModal({ video, onClose }) {
   const getYouTubeEmbedUrl = (url) => {
     if (!url) return "";
     const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1];
-    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+    return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : null;
   };
 
   return (
@@ -38,6 +38,7 @@ function VideosModal({ video, onClose }) {
               src={getYouTubeEmbedUrl(video.url)}
               title={video.title}
               allowFullScreen
+              allow="autoplay"
             />
           ) : (
             <a href={video.url} target="_blank" rel="noopener noreferrer" className={styles.externalVideoLink}>
@@ -116,7 +117,6 @@ export default function Videos() {
   return (
     <section className={styles.videos} ref={ref}>
       <div className={styles.heroHeader}>
-        <span className={styles.eyebrow}>Gallery</span>
         <h2 className={styles.heroTitle}>Our <em>Videos</em></h2>
       </div>
 
@@ -146,7 +146,6 @@ export default function Videos() {
               </div>
               <div className={styles.cardBody}>
                 <h3 className={styles.cardTitle}>{video.title}</h3>
-                <p className={styles.cardDescription}>{video.description || "No description"}</p>
               </div>
             </div>
           ))}

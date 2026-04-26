@@ -8,6 +8,7 @@ import AdminLogin from "./pages/AdminLogin";
 import AdminDashboard from "./pages/AdminDashboard";
 import NewsAdmin from "./components/NewsAdmin";
 import ExhibitionAdmin from "./components/ExhibitionAdmin";
+import ServicesAdmin from "./components/ServicesAdmin";
 import AdminRegister from "./pages/AdminRegister";
 
 export default function App() {
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/admin/news" element={<NewsAdmin />} />
         <Route path="/admin/exhibitions" element={<ExhibitionAdmin />} />
+        <Route path="/admin/services" element={<ServicesAdmin />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </>

@@ -1,30 +1,33 @@
 import React from "react";
-import chipImage from "../assets/chip.png"; // ← move the image to src/assets/chip.png
 import styles from "./PCBBackground.module.css";
+import chipImage from '../assets/pcbs.mp4';
 
 /**
- * PCBBackground — replaces the old canvas animation.
- * Renders the layered-chip photo with glow, scanlines, and vignette overlays
- * so it blends seamlessly into the dark hero section.
+ * PCBBackground — video version, right-panel layout.
+ * Video sits on the right half (like the chip image did),
+ * with glow, scanlines, and vignette overlays preserved.
  */
 export default function PCBBackground() {
   return (
     <div className={styles.wrapper} aria-hidden="true">
-      {/* Soft blue-gold ambient bloom behind the chip */}
+      {/* Soft ambient bloom behind the video */}
       <div className={styles.glow} />
 
-      {/* Hero chip image — positioned right-centre, slightly cropped at edges */}
-      <img
-        src={chipImage}
-        alt=""
-        className={styles.chip}
-        draggable={false}
-      />
+      {/* Video — positioned right-centre, same as chip image was */}
+      <div className={styles.videoContainer}>
+        <video
+          className={styles.video}
+          src={chipImage}
+          autoPlay
+          loop
+          muted
+        />
+      </div>
 
-      {/* Subtle horizontal scanlines — keeps the "tech screen" texture */}
+      {/* Subtle horizontal scanlines */}
       <div className={styles.scanlines} />
 
-      {/* Dark vignette so content text stays readable over the image */}
+      {/* Dark vignette — heavy on the left to protect text */}
       <div className={styles.vignette} />
     </div>
   );

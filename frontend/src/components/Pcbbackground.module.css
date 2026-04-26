@@ -1,6 +1,5 @@
 /* ── PCBBackground.module.css ──────────────────────────────────────── */
 
-/* Root wrapper — same absolute fill as the old canvas wrapper */
 .wrapper {
   position: absolute;
   inset: 0;
@@ -9,119 +8,125 @@
   overflow: hidden;
 }
 
-/* ── Ambient glow ─────────────────────────────────────────────────── */
-/* A large soft bloom centred slightly right, echoing the cyan + gold
-   colours in the chip photo. */
+/* ── Ambient glow — sits behind the video, bleeds left ── */
 .glow {
   position: absolute;
   inset: 0;
+  z-index: 1;
   background:
     radial-gradient(
-      ellipse 55% 55% at 68% 50%,
-      rgba(0, 180, 255, 0.18) 0%,
+      ellipse 60% 70% at 75% 50%,
+      rgba(0, 180, 255, 0.20) 0%,
       transparent 70%
     ),
     radial-gradient(
-      ellipse 35% 40% at 60% 55%,
-      rgba(245, 180, 0, 0.10) 0%,
+      ellipse 40% 45% at 65% 55%,
+      rgba(245, 180, 0, 0.12) 0%,
       transparent 65%
     );
-  animation: glowPulse 5s ease-in-out infinite alternate;
+  pointer-events: none;
 }
 
-@keyframes glowPulse {
-  from { opacity: 0.75; }
-  to   { opacity: 1;    }
-}
-
-/* ── Chip image ───────────────────────────────────────────────────── */
-.chip {
+/* ── Video container — full bleed, mask dissolves the left edge ── */
+.videoContainer {
   position: absolute;
+  top: 0;
+  right: 0;
+  width: 100%;          /* full bleed — mask handles the fade-in */
+  height: 100%;
 
-  /* Size — large enough to feel dramatic, cropped at bottom & right */
-  width: clamp(460px, 52vw, 780px);
-  height: auto;
+  z-index: 2;
+  overflow: hidden;
+  border-radius: 0;
+  opacity: 0.92;
 
-  /* Anchor to the right-centre of the hero */
-  top: 50%;
-  right: -4%;
-  transform: translateY(-50%);
-
-  /* Slight perspective tilt for depth */
-  transform: translateY(-50%) perspective(900px) rotateY(-8deg) rotateX(4deg);
-
-  /* Gentle float animation */
-  animation: chipFloat 7s ease-in-out infinite;
-
-  /* Blend with the dark background */
-  opacity: 0.88;
-  mix-blend-mode: lighten;
-
-  /* Prevent layout artifacts */
-  user-select: none;
-  -webkit-user-drag: none;
+  /* Dissolve the left edge of the image into the background color —
+     no hard seam, the GIF melts naturally into the dark left zone */
+  -webkit-mask-image: linear-gradient(
+    to right,
+    rgba(0,0,0,0.15)  0%,    /* GIF faintly visible at far left */
+    rgba(0,0,0,0.25)  20%,   /* slightly more visible mid-fade */
+    black             50%    /* fully visible from 50% onward */
+  );
+  mask-image: linear-gradient(
+    to right,
+    rgba(0,0,0,0.15)  0%,
+    rgba(0,0,0,0.25)  20%,
+    black             50%
+  );
 }
 
-@keyframes chipFloat {
-  0%, 100% { transform: translateY(-50%) perspective(900px) rotateY(-8deg) rotateX(4deg) translateY(0);   }
-  50%       { transform: translateY(-50%) perspective(900px) rotateY(-8deg) rotateX(4deg) translateY(-14px); }
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
 }
 
-/* ── Scanlines overlay ────────────────────────────────────────────── */
-/* Very subtle horizontal lines give a "monitor/tech panel" texture. */
+/* ── Scanlines ── */
 .scanlines {
   position: absolute;
   inset: 0;
+  z-index: 3;
   background: repeating-linear-gradient(
     to bottom,
-    transparent              0px,
-    transparent              3px,
-    rgba(0, 0, 0, 0.06)      3px,
-    rgba(0, 0, 0, 0.06)      4px
+    transparent         0px,
+    transparent         3px,
+    rgba(0,0,0,0.05)    3px,
+    rgba(0,0,0,0.05)    4px
   );
   pointer-events: none;
 }
 
-/* ── Vignette ─────────────────────────────────────────────────────── */
-/* Fades all four edges to the hero's background colour so content
-   text (left side) is always legible. Extra-heavy on the left. */
+/* ── Vignette — wider blend zone now that mask does the heavy lifting ── */
 .vignette {
   position: absolute;
   inset: 0;
+  z-index: 4;
   background:
-    /* strong left fade — protects text */
+    /* Left: solid dark → gentle fade, ends earlier since mask already blends */
     linear-gradient(
       to right,
-      var(--black, #020713) 0%,
-      rgba(2, 7, 19, 0.70) 28%,
-      rgba(2, 7, 19, 0)    55%
+      var(--black, #020713)   0%,
+      rgba(2, 7, 19, 0.95)   10%,
+      rgba(2, 7, 19, 0.75)   22%,
+      rgba(2, 7, 19, 0.40)   36%,
+      rgba(2, 7, 19, 0.12)   50%,
+      rgba(2, 7, 19, 0)      62%
     ),
-    /* top & bottom edge fade */
+    /* Top & bottom edge fades */
     linear-gradient(
       to bottom,
-      rgba(2, 7, 19, 0.55) 0%,
-      rgba(2, 7, 19, 0)    18%,
-      rgba(2, 7, 19, 0)    78%,
-      rgba(2, 7, 19, 0.70) 100%
+      rgba(2, 7, 19, 0.65) 0%,
+      rgba(2, 7, 19, 0)    22%,
+      rgba(2, 7, 19, 0)    72%,
+      rgba(2, 7, 19, 0.80) 100%
     );
   pointer-events: none;
 }
 
-/* ── Responsive ───────────────────────────────────────────────────── */
+/* ── Responsive ── */
 @media (max-width: 900px) {
-  .chip {
-    width: clamp(280px, 85vw, 460px);
+  .videoContainer {
     top: auto;
-    bottom: -60px;
-    right: 50%;
-    transform: translateX(50%) !important;
-    animation: chipFloatMobile 7s ease-in-out infinite;
-    opacity: 0.40; /* dimmer so stacked text stays readable */
-  }
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 55%;
+    opacity: 0.40;
 
-  @keyframes chipFloatMobile {
-    0%, 100% { transform: translateX(50%) translateY(0);    }
-    50%       { transform: translateX(50%) translateY(-10px); }
+    /* On mobile the fade comes from the top instead of the left */
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black       35%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0%,
+      black       35%
+    );
   }
 
   .vignette {
@@ -130,8 +135,8 @@
         to bottom,
         rgba(2, 7, 19, 0.30) 0%,
         rgba(2, 7, 19, 0)    25%,
-        rgba(2, 7, 19, 0)    55%,
-        rgba(2, 7, 19, 0.90) 100%
+        rgba(2, 7, 19, 0)    45%,
+        rgba(2, 7, 19, 0.95) 100%
       );
   }
 }

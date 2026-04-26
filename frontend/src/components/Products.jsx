@@ -230,6 +230,8 @@ export default function Products() {
   const [brokenImages, setBrokenImages] = useState({});
   const [activeCategory, setActiveCategory] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const searchInputRef = useRef(null);
   const [showAllPage, setShowAllPage] = useState(false);
   const [modalProduct, setModalProduct] = useState(null);
 
@@ -428,42 +430,14 @@ export default function Products() {
 
       {/* Hero header */}
       <div className={styles.heroHeader}>
-        <span className={styles.eyebrow}>Product Catalogue</span>
+        {/* <span className={styles.eyebrow}>Product Catalogue</span> */}
         <h2 className={styles.heroTitle}>
           The Finest Way To Experience<br />
           <em>Advanced Equipment</em>
         </h2>
       </div>
 
-      <div className={styles.searchRow}>
-        <label className={styles.searchField}>
-          <span className={styles.searchIcon} aria-hidden="true">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="11" cy="11" r="7" />
-              <path d="M20 20l-3.5-3.5" />
-            </svg>
-          </span>
-          <input
-            type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search products, categories, or details"
-            aria-label="Search products"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              className={styles.searchClear}
-              onClick={() => setSearchQuery("")}
-              aria-label="Clear search"
-            >
-              ✕
-            </button>
-          )}
-        </label>
-      </div>
-
-      {/* Category filter pills */}
+      {/* Row 1 — Filter pills */}
       <div className={styles.filterRow}>
         {categories.map((cat) => (
           <button
@@ -476,35 +450,46 @@ export default function Products() {
         ))}
       </div>
 
+      {/* Row 2 — Search icon on the right, expands left */}
       <div className={styles.searchRow}>
-        <label className={styles.searchField}>
-          <span className={styles.searchIcon} aria-hidden="true">
+        <div className={`${styles.searchWrapper} ${searchOpen ? styles.searchWrapperOpen : ""}`}>
+          <div className={styles.searchExpandable}>
+            <input
+              ref={searchInputRef}
+              type="search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search products…"
+              aria-label="Search products"
+              onBlur={() => { if (!searchQuery) setSearchOpen(false); }}
+            />
+            {searchQuery && (
+              <button
+                type="button"
+                className={styles.searchClear}
+                onClick={() => { setSearchQuery(""); setSearchOpen(false); }}
+                aria-label="Clear search"
+              >
+                ✕
+              </button>
+            )}
+          </div>
+
+          <button
+            className={styles.searchIconBtn}
+            aria-label="Open search"
+            onClick={() => {
+              setSearchOpen(true);
+              setTimeout(() => searchInputRef.current?.focus(), 50);
+            }}
+          >
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <circle cx="11" cy="11" r="7" />
               <path d="M20 20l-3.5-3.5" />
             </svg>
-          </span>
-          <input
-            type="search"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search products, categories, or details"
-            aria-label="Search products"
-          />
-          {searchQuery && (
-            <button
-              type="button"
-              className={styles.searchClear}
-              onClick={() => setSearchQuery("")}
-              aria-label="Clear search"
-            >
-              ✕
-            </button>
-          )}
-        </label>
+          </button>
+        </div>
       </div>
-
-      <p className={styles.resultCount}>{totalFiltered} product{totalFiltered === 1 ? "" : "s"} found</p>
 
       {loading && <p className={styles.loading}>Loading products…</p>}
 

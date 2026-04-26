@@ -14,8 +14,8 @@ export default function Hero() {
       </div> */}
 
       <h1 className={styles.title}>
-        {/* SATECH<br /> */}
-        <span className={styles.stroke}>SATECH</span>
+        <span className={styles.fill}>SA</span>
+        <span className={styles.stroke}>TECH</span>
       </h1>
 
       {/* <p className={styles.sub}>The Solutions Provider</p> */}

@@ -9,21 +9,23 @@
 
 /* ── CSS Variables ─────────────────────────────────────────── */
 :root {
-  --drum-radius: 300px;       /* cylinder radius — increase to spread cards further */
-  --card-w: 200px;
-  --card-h: 290px;
-  --trans: 900ms;             /* must match TRANSITION constant in Products.jsx */
+  --drum-radius: 320px;
+  --card-w: 220px;
+  --card-h: 320px;
+  --trans: 900ms;
   --gold: #ffc629;
-  --bg: #07080d;
-  --surface: #0f1018;
-  --text: #1a1a2e;
+  --gold-dim: rgba(255, 198, 41, 0.18);
+  --bg: #3d4fa0;          /* was #283176 — noticeably lighter */
+  --surface: #2e3a8a;     /* was #1e2560 — lighter card surfaces */
+  --text: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.6);
 }
 
 .products {
-  background: linear-gradient(135deg, #eef1f8 0%, #e2e9f5 50%, #dde6f4 100%);
+  background: var(--black);
   --mx: 50%;
   --my: 50%;
-  padding: 80px 0 0;
+  padding: 40px 0 0;
   font-family: var(--font-body, 'Cormorant Garamond', Georgia, serif);
   overflow: hidden;
   position: relative;
@@ -38,35 +40,36 @@
 .bgOrb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(110px);
+  filter: blur(120px);
   pointer-events: none;
   z-index: 0;
   animation: drift 18s ease-in-out infinite alternate;
+  display: none;
 }
 
 .orb1 {
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(201,168,76,0.09), transparent 70%);
-  top: -160px;
-  left: -160px;
+  width: 700px;
+  height: 700px;
+  background: radial-gradient(circle, rgba(255,198,41,0.18), transparent 65%); /* was 0.13 */
+  top: -200px;
+  left: -200px;
   animation-delay: 0s;
 }
 
 .orb2 {
-  width: 420px;
-  height: 420px;
-  background: radial-gradient(circle, rgba(80,120,220,0.07), transparent 70%);
-  bottom: 0;
-  right: -140px;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(60,80,220,0.22), transparent 65%); /* was 0.16 */
+  bottom: -100px;
+  right: -180px;
   animation-delay: -6s;
 }
 
 .orb3 {
-  width: 360px;
-  height: 360px;
-  background: radial-gradient(circle, rgba(180,80,120,0.05), transparent 70%);
-  top: 50%;
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, rgba(200,60,120,0.14), transparent 65%); /* was 0.10 */
+  top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
   animation-delay: -12s;
@@ -74,7 +77,7 @@
 
 @keyframes drift {
   from { transform: translate(0, 0) scale(1); }
-  to   { transform: translate(30px, 20px) scale(1.08); }
+  to   { transform: translate(30px, 20px) scale(1.1); }
 }
 
 /* Grain overlay */
@@ -82,9 +85,10 @@
   position: absolute;
   inset: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' opacity='1'/%3E%3C/svg%3E");
-  opacity: 0.032;
+  opacity: 0.028; /* slightly reduced to not dull the lighter bg */
   pointer-events: none;
   z-index: 1;
+  display: none;
 }
 
 /* ── Interactive Grid Lines ────────────────────────────────── */
@@ -94,11 +98,12 @@
   pointer-events: none;
   z-index: 0;
   background-image:
-    linear-gradient(rgba(100, 130, 200, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(100, 130, 200, 0.07) 1px, transparent 1px);
+    linear-gradient(rgba(255, 198, 41, 0.06) 1px, transparent 1px), /* was 0.04 */
+    linear-gradient(90deg, rgba(255, 198, 41, 0.06) 1px, transparent 1px);
   background-size: 60px 60px;
   mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 100%);
   animation: gridShift 20s linear infinite;
+  display: none;
 }
 
 @keyframes gridShift {
@@ -113,12 +118,13 @@
   pointer-events: none;
   z-index: 1;
   background: radial-gradient(
-    600px circle at var(--mx) var(--my),
-    rgba(201, 168, 76, 0.06) 0%,
-    rgba(100, 140, 220, 0.04) 40%,
+    700px circle at var(--mx) var(--my),
+    rgba(201, 168, 76, 0.12) 0%,   /* was 0.09 */
+    rgba(100, 140, 220, 0.07) 40%, /* was 0.05 */
     transparent 70%
   );
   transition: background 0.05s ease;
+  display: none;
 }
 
 /* ── Floating Particles ─────────────────────────────────────── */
@@ -129,6 +135,7 @@
   z-index: 0;
   opacity: 0;
   animation: floatUp 12s ease-in-out infinite;
+  display: none;
 }
 
 .p1 { width: 6px;  height: 6px;  background: rgba(201,168,76,0.5);   left: 12%;  animation-delay: 0s;   animation-duration: 11s; }
@@ -171,7 +178,7 @@
   font-size: clamp(28px, 4vw, 46px);
   font-weight: 700;
   line-height: 1.15;
-  color: var(--text);
+  color: #ffffff;
   margin: 0;
   letter-spacing: -0.5px;
 }
@@ -182,41 +189,178 @@
   font-family: var(--font-body, 'Cormorant Garamond', Georgia, serif);
 }
 
+/* ── Search — icon on right, expands LEFT ──────────────────── */
+.searchWrapper {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin-left: auto;
+  flex-direction: row;
+}
+
+.searchIconBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 198, 41, 0.32);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(8px);
+  color: rgba(255, 198, 41, 0.72);
+  cursor: pointer;
+  flex-shrink: 0;
+  z-index: 2;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease, border-radius 0.25s ease;
+}
+
+.searchIconBtn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(255, 198, 41, 0.08);
+}
+
+.searchExpandable {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow: hidden;
+  width: 0;
+  opacity: 0;
+  pointer-events: none;
+  margin-right: -18px;
+  padding-right: 24px;
+  height: 36px;
+  background: rgba(46, 58, 138, 0.9);  /* was rgba(28, 35, 88, 0.9) — matches new --surface */
+  border: 1.5px solid rgba(255, 198, 41, 0.28);
+  border-right: none;
+  border-radius: 999px 0 0 999px;
+  backdrop-filter: blur(16px);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255,255,255,0.07); /* lighter shadow */
+  transition: width 0.32s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.22s ease;
+  direction: ltr;
+}
+
+.searchWrapperOpen .searchIconBtn {
+  border-radius: 0 50% 50% 0;
+  border-left: none;
+  border-color: rgba(255, 198, 41, 0.55);
+  background: rgba(46, 58, 138, 0.9); /* matched */
+  color: var(--gold);
+}
+
+.searchWrapperOpen .searchExpandable {
+  width: 210px;
+  opacity: 1;
+  pointer-events: all;
+  padding-left: 14px;
+  border-color: rgba(255, 198, 41, 0.55);
+  box-shadow:
+    0 0 0 3px rgba(255, 198, 41, 0.07),
+    0 4px 20px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.searchExpandable input[type="search"] {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: transparent;
+  outline: none;
+  font-family: var(--font-body, 'Cormorant Garamond', Georgia, serif);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  color: #ffffff;
+}
+
+.searchExpandable input[type="search"]::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+}
+
+.searchExpandable input[type="search"]::-webkit-search-cancel-button,
+.searchExpandable input[type="search"]::-webkit-search-decoration {
+  display: none;
+}
+
+.searchClear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(201, 168, 76, 0.3);
+  background: rgba(201, 168, 76, 0.08);
+  color: rgba(201, 168, 76, 0.65);
+  font-size: 9px;
+  cursor: pointer;
+  line-height: 1;
+  transition: background 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+.searchClear:hover {
+  background: rgba(201, 168, 76, 0.18);
+  color: var(--gold);
+  border-color: var(--gold);
+}
+
 /* ── Filter Pills ──────────────────────────────────────────── */
 .filterRow {
   position: relative;
   z-index: 10;
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: center;
-  margin-bottom: 40px;
+  width: min(96vw, 1100px);
   padding: 0 24px;
+  margin: 0 auto 12px;
+}
+
+.searchRow {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  justify-content: flex-end;
+  width: min(96vw, 1100px);
+  padding: 0 24px;
+  margin: 0 auto 32px;
 }
 
 .pill {
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: capitalize;
-  padding: 8px 22px;
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 9px 24px;
   border-radius: 999px;
-  border: 1.5px solid rgba(201, 168, 76, 0.28);
-  background: transparent;
-  color: #1a1a2e;
+  border: 1.5px solid rgba(255, 198, 41, 0.35); /* slightly more visible */
+  background: rgba(255, 255, 255, 0.08);        /* was 0.05 */
+  color: rgba(232, 226, 212, 0.9);              /* was 0.8 */
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.22s ease;
   font-family: var(--font-body, 'Cormorant Garamond', Georgia, serif);
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.08);
 }
 
 .pill:hover {
   border-color: var(--gold);
   color: var(--gold);
+  background: rgba(255, 198, 41, 0.10);
+  box-shadow: 0 4px 20px rgba(201, 168, 76, 0.18), inset 0 1px 0 rgba(255,255,255,0.10);
+  transform: translateY(-1px);
 }
 
 .pillActive {
   background: var(--gold) !important;
   border-color: var(--gold) !important;
-  color: var(--bg) !important;
+  color: #07080d !important;
+  box-shadow: 0 4px 20px rgba(201, 168, 76, 0.4), 0 0 0 3px rgba(201, 168, 76, 0.15) !important;
+  transform: translateY(-1px);
 }
 
 /* ── Loading ───────────────────────────────────────────────── */
@@ -227,67 +371,47 @@
   font-size: 0.62rem;
   letter-spacing: 0.3em;
   text-transform: uppercase;
-  color:#1a1a2e;
+  color: rgba(232, 226, 212, 0.5); /* was 0.4 */
   margin-bottom: 24px;
 }
 
 /* ════════════════════════════════════════════════════════════
    TRUE 360° Carousel — Rotating Drum Architecture
-   
-   How it works:
-   1. .stage sets up the perspective (the camera)
-   2. .drum is the actual 3D cylinder sitting inside the stage.
-      It rotates on its Y axis. All cards are children of .drum.
-   3. Each .card is fixed at its angular slot via:
-        rotateY(slotAngle) translateZ(--drum-radius)
-      Cards never move — only the drum rotates.
-   4. Cards facing away from camera (behind the drum) are 
-      darkened via brightness/opacity CSS on :not(.cardActive).
 ════════════════════════════════════════════════════════════ */
 
-/* Stage — perspective camera */
 .stage {
   position: relative;
   z-index: 10;
   width: min(98vw, 1100px);
-  height: 360px;
+  height: 420px;
   margin: 0 auto;
-
-  /* Perspective — distance from viewer to the z=0 plane */
-  perspective: 1200px;
-  perspective-origin: 50% 42%;
+  perspective: 1400px;
+  perspective-origin: 50% 44%;
 }
 
-/* Ground shadow below stage */
-.stage::after {
+/* .stage::after {
   content: '';
   position: absolute;
   bottom: -18px;
   left: 50%;
   transform: translateX(-50%);
-  width: 65%;
-  height: 28px;
-  background: radial-gradient(ellipse, rgba(0,0,0,0.12) 0%, transparent 70%);
+  width: 45%;
+  height: 40px;
+  background: radial-gradient(ellipse, rgba(100, 100, 100, 0.08) 0%, rgba(0,0,0,0.03) 50%, transparent 70%);
   pointer-events: none;
   z-index: 0;
-}
+} */
 
-/* Drum — the rotating 3D cylinder */
 .drum {
   position: absolute;
-  /* Center the drum origin at the stage center */
   top: 0;
   left: 50%;
   margin-left: 0;
-  width: 0;   /* zero-width anchor: cards extend outward via translateZ */
+  width: 0;
   height: 100%;
-
   transform-style: preserve-3d;
   transform-origin: center center;
-
-  /* Smooth 360° rotation — easing matches a physical spin */
   transition: transform var(--trans) cubic-bezier(0.76, 0, 0.24, 1);
-
   cursor: grab;
   user-select: none;
 }
@@ -302,28 +426,26 @@
   width: var(--card-w);
   height: var(--card-h);
   top: 30px;
-  /* Offset so the card is centered on the drum origin */
   left: calc(var(--card-w) / -2);
   border-radius: 18px;
   overflow: hidden;
   transform-style: preserve-3d;
   cursor: default;
   will-change: transform, opacity, filter;
-  
-  /*
-   * No transition on transform here —
-   * the drum parent handles the spin transition.
-   * We DO transition opacity/filter/box-shadow for the
-   * active-card highlight effect.
-   */
+
   transition:
     opacity   var(--trans) ease,
     filter    var(--trans) ease,
     box-shadow var(--trans) ease;
 
-  /* Cards that aren't active: dim & desaturate */
-  opacity: 0.35;
-  filter: brightness(0.35) saturate(0.4);
+  /* ── BRIGHTENED inactive cards ──
+     opacity : 0.55 → 0.78  (much more visible)
+     brightness: 0.55 → 0.82 (noticeably lighter)
+     saturate: 0.6 → 0.85   (more colour)
+     blur removed entirely
+  ── */
+  opacity: 0.78;
+  filter: brightness(0.82) saturate(0.85);
   box-shadow: none;
 }
 
@@ -332,19 +454,22 @@
   opacity: 1;
   filter: none;
   cursor: pointer;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.25), 0 0 0 1px rgba(201,168,76,0.25);
+  box-shadow:
+    0 30px 80px rgba(0, 0, 0, 0.45),
+    0 0 0 1.5px rgba(201, 168, 76, 0.55),
+    0 0 60px rgba(201, 168, 76, 0.20),
+    0 0 120px rgba(201, 168, 76, 0.10);
 }
 
-/* Gold ring on active */
 .cardActive::after {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: 18px;
-  border: 1px solid rgba(201, 168, 76, 0.32);
+  border: 1.5px solid rgba(201, 168, 76, 0.6);
   box-shadow:
-    0 0 50px rgba(201, 168, 76, 0.07) inset,
-    0 16px 50px rgba(0, 0, 0, 0.18);
+    0 0 40px rgba(201, 168, 76, 0.18) inset,
+    0 0 0 6px rgba(201, 168, 76, 0.06) inset;
   pointer-events: none;
   z-index: 3;
 }
@@ -365,7 +490,6 @@
   transition: transform 6s linear;
 }
 
-/* Slow Ken Burns on active card */
 .cardActive .cardImage {
   transform: scale(1.07);
 }
@@ -376,19 +500,20 @@
   inset: 0;
   background: linear-gradient(
     to top,
-    rgba(10, 20, 60, 0.92) 0%,
-    rgba(15, 30, 80, 0.45) 48%,
+    rgba(5, 10, 40, 0.97) 0%,
+    rgba(10, 20, 65, 0.65) 42%,
+    rgba(15, 28, 70, 0.15) 72%,
     transparent 100%
   );
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 26px 22px;
+  padding: 28px 22px;
   opacity: 0;
-  transform: translateY(6px);
+  transform: translateY(8px);
   transition:
-    opacity 0.5s ease,
-    transform 0.5s ease;
+    opacity 0.45s ease,
+    transform 0.45s ease;
   z-index: 2;
 }
 
@@ -421,7 +546,7 @@
   margin-top: 6px;
   line-height: 1.55;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
+line-clamp: 2;    
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -439,24 +564,28 @@
 }
 
 .arrowBtn {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
-  border: 1.5px solid rgba(201, 168, 76, 0.3);
-  background: transparent;
-  font-size: 16px;
+  border: 1.5px solid rgba(201, 168, 76, 0.4);
+  background: rgba(201, 168, 76, 0.08); /* was 0.06 */
+  backdrop-filter: blur(12px);
+  font-size: 22px;
   color: var(--gold);
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  transition: all 0.22s ease;
   flex-shrink: 0;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.10);
 }
 
 .arrowBtn:hover {
-  background: rgba(201, 168, 76, 0.1);
+  background: rgba(201, 168, 76, 0.20);
   border-color: var(--gold);
+  box-shadow: 0 6px 28px rgba(201, 168, 76, 0.28), inset 0 1px 0 rgba(255,255,255,0.12);
+  transform: scale(1.08);
 }
 
 /* ── Progress Pips ─────────────────────────────────────────── */
@@ -467,20 +596,22 @@
 }
 
 .pip {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: rgba(242, 237, 230, 0.22);
-  transition: all 0.4s ease;
+  background: rgba(242, 237, 230, 0.38); /* was 0.28 */
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
+  border: 1px solid rgba(201, 168, 76, 0.2);
 }
 
 .pipActive {
   background: var(--gold);
-  width: 18px;
+  width: 24px;
   border-radius: 3px;
+  box-shadow: 0 0 8px rgba(201, 168, 76, 0.5);
+  border-color: transparent;
 }
-
 
 /* ── View All Button ───────────────────────────────────────── */
 .viewAllWrap {
@@ -517,7 +648,7 @@
 .modalBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(4, 4, 10, 0.88);
+  background: rgba(30, 40, 100, 0.88); /* was rgba(20,26,70,0.92) — slightly lighter */
   backdrop-filter: blur(8px);
   z-index: 9999;
   display: flex;
@@ -534,13 +665,13 @@
 
 .modalCard {
   position: relative;
-  background: var(--surface);
-  border: 1px solid rgba(201, 168, 76, 0.2);
+  background: #ffffff;  /* changed to white */
+  border: 1px solid rgba(201, 168, 76, 0.25);
   border-radius: 24px;
   overflow: hidden;
   width: 100%;
   max-width: 480px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.7), 0 0 60px rgba(201, 168, 76, 0.05) inset;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55), 0 0 60px rgba(201, 168, 76, 0.06) inset;
   animation: slideUp 0.25s ease;
 }
 
@@ -558,7 +689,7 @@
   height: 34px;
   border-radius: 50%;
   border: 1px solid rgba(201, 168, 76, 0.3);
-  background: rgba(7, 8, 13, 0.8);
+  background: rgba(46, 58, 138, 0.85); /* matched to new --surface */
   backdrop-filter: blur(6px);
   font-size: 14px;
   color: var(--gold);
@@ -580,8 +711,8 @@
 
 .modalBadge {
   display: inline-block;
-  background: rgba(201, 168, 76, 0.1);
-  border: 1px solid rgba(201, 168, 76, 0.25);
+  background: rgba(201, 168, 76, 0.12); /* was 0.10 */
+  border: 1px solid rgba(201, 168, 76, 0.28);
   border-radius: 999px;
   padding: 4px 14px;
   font-size: 10px;
@@ -596,7 +727,7 @@
   font-family: var(--font-display, 'Cinzel', 'Georgia', serif);
   font-size: 22px;
   font-weight: 600;
-  color: #e8e0d4;
+  color: #1a1a1a;  /* changed from #ffffff to dark for white bg */
   margin: 0 0 14px;
   line-height: 1.3;
   letter-spacing: 0.04em;
@@ -605,16 +736,15 @@
 .modalDetail {
   font-size: 14px;
   line-height: 1.8;
-  color: rgba(200, 195, 215, 0.7);
+  color: #333333;  /* changed from rgba(255, 255, 255, 0.75) to dark */
   margin: 0 0 28px;
 }
 
-/* Badge used in carousel cards (grid view) */
 .badge {
   position: absolute;
   top: 10px;
   left: 10px;
-  background: rgba(7, 8, 13, 0.72);
+  background: rgba(46, 58, 138, 0.85); /* matched to new --surface */
   backdrop-filter: blur(6px);
   border-radius: 999px;
   padding: 4px 12px;
@@ -623,7 +753,7 @@
   text-transform: uppercase;
   color: var(--gold);
   font-family: var(--font-mono, 'Courier New', monospace);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   z-index: 2;
   border: 1px solid rgba(201, 168, 76, 0.2);
 }
@@ -632,10 +762,10 @@
 .imageFallback {
   width: 100%;
   height: 100%;
-  background: #0d0f18;
+  background: var(--surface);
   display: grid;
   place-items: center;
-  color: rgba(201, 168, 76, 0.3);
+  color: rgba(201, 168, 76, 0.35); /* slightly more visible */
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -662,7 +792,7 @@
   text-transform: uppercase;
   padding: 9px 20px;
   border-radius: 999px;
-  border: 1.5px solid rgba(201, 168, 76, 0.3);
+  border: 1.5px solid rgba(201, 168, 76, 0.35);
   background: transparent;
   color: var(--gold);
   cursor: pointer;
@@ -673,7 +803,7 @@
 }
 
 .backBtn:hover {
-  background: rgba(201, 168, 76, 0.1);
+  background: rgba(201, 168, 76, 0.12);
   border-color: var(--gold);
 }
 
@@ -682,7 +812,6 @@
   flex-direction: column;
 }
 
-/* All-products grid */
 .allGrid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -694,16 +823,16 @@
   border-radius: 18px;
   overflow: hidden;
   background: var(--surface);
-  border: 1px solid rgba(201, 168, 76, 0.08);
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(201, 168, 76, 0.12); /* was 0.08 */
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);  /* was 0.3 */
   cursor: pointer;
   transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
 .gridCard:hover {
   transform: translateY(-5px) scale(1.01);
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.5);
-  border-color: rgba(201, 168, 76, 0.25);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
+  border-color: rgba(201, 168, 76, 0.30);
 }
 
 .gridImageWrap {
@@ -724,12 +853,11 @@
   transform: scale(1.05);
 }
 
-/* Expand hint icon */
 .tapHint {
   position: absolute;
   bottom: 10px;
   right: 10px;
-  background: rgba(7, 8, 13, 0.7);
+  background: rgba(46, 58, 138, 0.85); /* matched */
   backdrop-filter: blur(6px);
   border-radius: 50%;
   width: 30px;
@@ -739,7 +867,7 @@
   justify-content: center;
   color: var(--gold);
   z-index: 2;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
   pointer-events: none;
   opacity: 0;
   transition: opacity 0.2s ease;
@@ -752,9 +880,9 @@
 /* ── Responsive ────────────────────────────────────────────── */
 @media (max-width: 768px) {
   :root {
-    --drum-radius: 210px;
-    --card-w: 160px;
-    --card-h: 230px;
+    --drum-radius: 230px;
+    --card-w: 175px;
+    --card-h: 250px;
   }
 
   .products {
@@ -762,8 +890,8 @@
   }
 
   .stage {
-    height: 300px;
-    perspective: 900px;
+    height: 340px;
+    perspective: 1000px;
   }
 
   .allPageHeader {

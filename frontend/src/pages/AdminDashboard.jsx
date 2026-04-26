@@ -6,6 +6,7 @@ import jsPDF from 'jspdf';
 import * as XLSX from 'xlsx';
 import html2canvas from 'html2canvas';
 import { videoService } from '../services/videoService';
+import ServicesAdmin from '../components/ServicesAdmin';
 
 const TOKEN_KEY = "satech_admin_token";
 
@@ -845,6 +846,11 @@ export default function AdminDashboard() {
               Exhibitions
               <span className={styles.navBadge}>↗</span>
             </button>
+            <button className={styles.navItem} onClick={() => navigate("/admin/services")}>
+              <span className={styles.navIcon}>⚡</span>
+              Services
+              <span className={styles.navBadge}>↗</span>
+            </button>
           </div>
         </nav>
 
@@ -915,6 +921,14 @@ export default function AdminDashboard() {
                   <div className={styles.quickCardBody}>
                     <h3>Exhibition Gallery</h3>
                     <p>Manage trade show and exhibition photo galleries</p>
+                  </div>
+                  <div className={styles.quickCardArrow}>→</div>
+                </div>
+                <div className={styles.quickCard} onClick={() => navigate("/admin/services")}>
+                  <div className={styles.quickCardIcon}>⚡</div>
+                  <div className={styles.quickCardBody}>
+                    <h3>Services</h3>
+                    <p>Manage service offerings with titles, descriptions, and images</p>
                   </div>
                   <div className={styles.quickCardArrow}>→</div>
                 </div>
@@ -1294,7 +1308,7 @@ export default function AdminDashboard() {
 
           {/* SERVICES TAB */}
           {!isLoading && !error && activeTab === "services" && (
-            <ServiceAdmin />
+            <ServicesAdmin />
           )}
         </div>
 

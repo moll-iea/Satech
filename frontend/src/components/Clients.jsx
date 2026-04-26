@@ -67,7 +67,7 @@ export default function Exhibitions() {
       <div className={styles.container}>
         <div className={styles.leftContent}>
           <div className={styles.header}>
-            <div className="section-tag">// Exhibitions</div>
+            <div className="section-tag">Exhibitions</div>
             <h2 className="section-title">Featured In<br />Top Industry Events</h2>
             <div className="divider" />
             <p className={styles.sub}>
