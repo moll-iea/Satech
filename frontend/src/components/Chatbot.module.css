@@ -1,0 +1,178 @@
+.chatRoot {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1200;
+  display: grid;
+  gap: 12px;
+  justify-items: end;
+}
+
+.launcher {
+  border: none;
+  border-radius: 999px;
+  padding: 12px 20px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--black);
+  background: linear-gradient(135deg, var(--gold), #ffd84d);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.launcher:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+}
+
+.panel {
+  width: min(92vw, 360px);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background:
+    radial-gradient(circle at top right, rgba(255, 204, 0, 0.15), transparent 60%),
+    linear-gradient(170deg, rgba(0, 0, 0, 0.75), rgba(11, 22, 60, 0.95));
+  backdrop-filter: blur(8px);
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 14px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--gold);
+  text-transform: uppercase;
+}
+
+.title {
+  margin-top: 4px;
+  font-family: var(--font-display);
+  font-size: 24px;
+  line-height: 1;
+  color: var(--light);
+}
+
+.iconButton {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--light);
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+}
+
+.messages {
+  display: grid;
+  gap: 10px;
+  padding: 12px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.botBubble,
+.userBubble {
+  max-width: 92%;
+  border-radius: 14px;
+  padding: 10px 12px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.botBubble {
+  justify-self: start;
+  background: rgba(143, 197, 255, 0.15);
+  border: 1px solid rgba(143, 197, 255, 0.3);
+  color: var(--light);
+}
+
+.userBubble {
+  justify-self: end;
+  background: rgba(255, 204, 0, 0.18);
+  border: 1px solid rgba(255, 204, 0, 0.35);
+  color: #fff4c7;
+}
+
+.quickRow {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding: 2px 12px 10px;
+}
+
+.quickButton {
+  flex: 0 0 auto;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--light);
+  border-radius: 999px;
+  padding: 6px 10px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.quickButton:hover {
+  border-color: rgba(255, 204, 0, 0.5);
+}
+
+.inputRow {
+  display: flex;
+  gap: 8px;
+  padding: 0 12px 12px;
+}
+
+.input {
+  flex: 1;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.25);
+  color: var(--light);
+  padding: 10px;
+  outline: none;
+}
+
+.input::placeholder {
+  color: rgba(240, 237, 230, 0.55);
+}
+
+.input:focus {
+  border-color: rgba(255, 204, 0, 0.7);
+}
+
+.sendButton {
+  border: none;
+  border-radius: 10px;
+  background: var(--gold);
+  color: var(--black);
+  font-weight: 700;
+  padding: 10px 12px;
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .chatRoot {
+    right: 12px;
+    bottom: 12px;
+  }
+
+  .panel {
+    width: min(94vw, 340px);
+  }
+
+  .messages {
+    max-height: 260px;
+  }
+}

@@ -11,6 +11,7 @@ import Clients from "../components/Clients";
 import Global from "../components/Global";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
+import Chatbot from "../components/Chatbot";
 
 export default function HomePage() {
   return (
@@ -26,6 +27,7 @@ export default function HomePage() {
       <About />
       <Contact />
       <Footer />
+      <Chatbot />
     </>
   );
 }
