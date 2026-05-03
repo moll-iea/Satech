@@ -669,8 +669,8 @@ line-clamp: 2;
   border: 1px solid rgba(201, 168, 76, 0.25);
   border-radius: 24px;
   overflow: hidden;
-  width: 100%;
-  max-width: 480px;
+  width: 280px;
+  height: 420px;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55), 0 0 60px rgba(201, 168, 76, 0.06) inset;
   animation: slideUp 0.25s ease;
 }

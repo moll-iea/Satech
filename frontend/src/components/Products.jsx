@@ -45,7 +45,14 @@ function ProductModal({ product, onClose }) {
         <div className={styles.modalBody}>
           <span className={styles.modalBadge}>{product.category}</span>
           <h3 className={styles.modalName}>{product.name}</h3>
-          <p className={styles.modalDetail}>{product.detail}</p>
+          <div className={styles.modalDetail}>
+            {product.detail
+              ?.split("\n")
+              .filter((line) => line.trim())
+              .map((line, idx) => (
+                <div key={idx}>{line.trim()}</div>
+              ))}
+          </div>
         </div>
       </div>
     </div>
@@ -433,7 +440,7 @@ export default function Products() {
         {/* <span className={styles.eyebrow}>Product Catalogue</span> */}
         <h2 className={styles.heroTitle}>
           The Finest Way To Experience<br />
-          <em>Advanced Equipment</em>
+          <em>Advanced Solutions</em>
         </h2>
       </div>
 

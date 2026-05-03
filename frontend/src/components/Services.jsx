@@ -88,8 +88,8 @@ export default function Services() {
         {/* Left: description + nav */}
         <div className={styles.sideCol}>
           <p className={styles.sideDesc}>
-            From equipment supply and technical support to factory automation and
-            legal services — SATECH delivers comprehensive solutions that
+            From fabrication, board repair,equipment supply and technical support to factory automation and
+            other services — SATECH delivers comprehensive solutions that
             drive value across your entire operation.
           </p>
 

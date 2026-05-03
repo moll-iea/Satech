@@ -146,6 +146,7 @@ export default function Videos() {
               </div>
               <div className={styles.cardBody}>
                 <h3 className={styles.cardTitle}>{video.title}</h3>
+                <p className={styles.cardDescription}>{video.description}</p>
               </div>
             </div>
           ))}

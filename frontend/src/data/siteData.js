@@ -17,11 +17,10 @@ export const HERO_STATS = [
 ];
 
 export const MARQUEE_ITEMS = [
-  "Automotive", "Aerospace", "Digital",
-  "Electronics", "Foods", "Pharmaceutical",
-  "Laboratories", "Logistics", "Machine Shops",
-  "Maritime", "Medical", "Mining",
-  "Power Generation", "Semiconductors", "Telecommunications",
+  "Aerospace", "Automotive", "Construction", "Digital",
+  "Electronics", "Foods", "Laboratories", "Logistics",
+  "Machine Shops", "Maritime", "Medical", "Mining",
+  "Pharmaceutical", "Power Generation", "Semiconductors", "Telecommunications",
 ];
 
 export const VALUES = [

@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { CONTACT_INFO, PRODUCT_TABS, SERVICES } from "../data/siteData";
 import styles from "./Chatbot.module.css";
+import pogiAvatar from "../assets/Xam.png";
 
 const INITIAL_MESSAGE = {
   id: "welcome",
   role: "bot",
-  text: "Hello! I am the SA TECH assistant. Ask me about products, services, exhibitions, news, or how to contact the team.",
+  text: "Hi there! Nice to see you",
 };
 
 const QUICK_REPLIES = [
@@ -102,20 +103,27 @@ export default function Chatbot() {
   return (
     <div className={styles.chatRoot} aria-live="polite">
       {isOpen && (
-        <section className={styles.panel} aria-label="SA TECH assistant">
+        <section className={styles.panel} aria-label="SATECH assistant">
           <header className={styles.header}>
-            <div>
-              <p className={styles.eyebrow}>Virtual Support</p>
-              <h3 className={styles.title}>SA TECH Assistant</h3>
+            <div className={styles.headerContent}>
+              <div className={styles.avatarSection}>
+                <div className={styles.avatar}>
+                <img src={pogiAvatar} alt="Sam" className={styles.avatarImage} />
+              </div>
+                <div className={styles.greetingSection}>
+                  <h3 className={styles.greeting}>Hi there 👋</h3>
+                  <p className={styles.subtext}>IM MAX</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                className={styles.iconButton}
+                onClick={() => setIsOpen(false)}
+                aria-label="Close chat"
+              >
+                ×
+              </button>
             </div>
-            <button
-              type="button"
-              className={styles.iconButton}
-              onClick={() => setIsOpen(false)}
-              aria-label="Close chat"
-            >
-              x
-            </button>
           </header>
 
           <div className={styles.messages} ref={bodyRef}>
@@ -168,12 +176,19 @@ export default function Chatbot() {
 
       <button
         type="button"
-        className={styles.launcher}
+        className={`${styles.launcher} ${isOpen ? styles.open : ""}`}
         onClick={() => setIsOpen((prev) => !prev)}
         aria-expanded={isOpen}
         aria-label="Open chat"
       >
-        {isOpen ? "Close" : "Chat"}
+        <svg
+          className={styles.chatIcon}
+          viewBox="0 0 24 24"
+          fill="currentColor"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12h-8v-2h8v2zm0-3h-8V9h8v2zm0-3H6V6h12v2z" />
+        </svg>
       </button>
     </div>
   );
