@@ -17,7 +17,7 @@ export default function Hero() {
         <span className={styles.fill}>SA</span>
         <span className={styles.stroke}>TECH</span>
       </h1>
-      <p className={styles.sub}>The Solutions Provider</p>
+      <p className={styles.sub}>The Solutions Provider!</p>
 
       <p className={styles.tagline}>
         <span className={styles.colorA}>Sell</span> <span className={styles.circleText}>the problem you solve</span> <span className={styles.colorA}>,</span> <br />

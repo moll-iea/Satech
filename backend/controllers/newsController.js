@@ -25,9 +25,9 @@ exports.getNewsById = async (req, res) => {
 
 // Create news article
 exports.createNews = async (req, res) => {
-  const { title, category, date, summary, link, source, author } = req.body;
+  const { title, category, date, link } = req.body;
 
-  if (!title || !category || !date || !summary) {
+  if (!title || !category || !date) {
     return res.status(400).json({ message: 'Missing required fields' });
   }
 
@@ -35,10 +35,7 @@ exports.createNews = async (req, res) => {
     title,
     category,
     date: new Date(date),
-    summary,
     link: link || '#',
-    source: source || null,
-    author: author || null,
     imageUrl: req.file ? req.file.path : null,  // ✅ Cloudinary returns full URL in req.file.path
   });
 
@@ -53,7 +50,7 @@ exports.createNews = async (req, res) => {
 // Update news article
 exports.updateNews = async (req, res) => {
   const { id } = req.params;
-  const { title, category, date, summary, link, source, author } = req.body;
+  const { title, category, date, link } = req.body;
 
   try {
     const news = await News.findById(id);
@@ -64,10 +61,7 @@ exports.updateNews = async (req, res) => {
     if (title) news.title = title;
     if (category) news.category = category;
     if (date) news.date = new Date(date);
-    if (summary) news.summary = summary;
     if (link) news.link = link;
-    if (source) news.source = source;
-    if (author) news.author = author;
     if (req.file) {
       news.imageUrl = req.file.path;  // ✅ Same fix here
     }

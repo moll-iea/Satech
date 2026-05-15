@@ -11,7 +11,6 @@ export default function Global() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [showModal, setShowModal] = useState(false);
   const [hoveredId, setHoveredId] = useState(null);
-  const [selectedArticle, setSelectedArticle] = useState(null);
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -88,7 +87,7 @@ export default function Global() {
                     className={`${styles.sidebarItem} ${hoveredId === item._id ? styles.sidebarItemActive : ""}`}
                     onMouseEnter={() => setHoveredId(item._id)}
                     onMouseLeave={() => setHoveredId(null)}
-                    onClick={() => setSelectedArticle(item)}
+                    onClick={() => window.open(item.link, '_blank')}
                     style={{ cursor: "pointer" }}
                   >
                     <div className={styles.sidebarImage}>
@@ -100,30 +99,6 @@ export default function Global() {
                     </div>
                     <div>
                       <p className={styles.sidebarTitle}>{item.title}</p>
-                      <div className={styles.sidebarMeta}>
-                        {item.source && (
-                          <span className={styles.sidebarMetaRow}>
-                            <span className={styles.sidebarMetaLabel}>Source</span>
-                            <span className={styles.sidebarMetaValue}>{item.source}</span>
-                          </span>
-                        )}
-                        <span className={styles.sidebarMetaRow}>
-                          <span className={styles.sidebarMetaLabel}>Date</span>
-                          <span className={styles.sidebarMetaValue}>
-                            {item.date ? new Date(item.date).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            }) : "—"}
-                          </span>
-                        </span>
-                        {item.author && (
-                          <span className={styles.sidebarMetaRow}>
-                            <span className={styles.sidebarMetaLabel}>Author</span>
-                            <span className={styles.sidebarMetaValue}>{item.author}</span>
-                          </span>
-                        )}
-                      </div>
                     </div>
                   </li>
                 ))}
@@ -246,89 +221,7 @@ export default function Global() {
             </div>
           )}
 
-          {/* Article Details Modal */}
-          {selectedArticle && (
-            <div className={styles.modalOverlay} onClick={() => setSelectedArticle(null)}>
-              <div className={styles.detailsModal} onClick={(e) => e.stopPropagation()}>
-                <button
-                  className={styles.closeBtn}
-                  onClick={() => setSelectedArticle(null)}
-                  aria-label="Close modal"
-                  style={{ position: "absolute", top: "20px", right: "20px", zIndex: 10 }}
-                >
-                  ✕
-                </button>
 
-                {/* Article image */}
-                <div className={styles.detailsImageWrap}>
-                  {selectedArticle.imageUrl ? (
-                    <img
-                      src={selectedArticle.imageUrl}
-                      alt={selectedArticle.title}
-                      className={styles.detailsImage}
-                    />
-                  ) : (
-                    <div className={styles.detailsImageFallback}>
-                      <span className={styles.fallbackIcon}>📰</span>
-                    </div>
-                  )}
-                  <span className={styles.categoryBadge}>{selectedArticle.category}</span>
-                </div>
-
-                {/* Article content */}
-                <div className={styles.detailsContent}>
-                  <h2 className={styles.detailsTitle}>{selectedArticle.title}</h2>
-
-                  {/* Metadata */}
-                  <div className={styles.detailsMeta}>
-                    {selectedArticle.source && (
-                      <div className={styles.detailsMetaItem}>
-                        <span className={styles.detailsMetaLabel}>Source</span>
-                        <span className={styles.detailsMetaValue}>{selectedArticle.source}</span>
-                      </div>
-                    )}
-                    {selectedArticle.date && (
-                      <div className={styles.detailsMetaItem}>
-                        <span className={styles.detailsMetaLabel}>Date</span>
-                        <span className={styles.detailsMetaValue}>
-                          {new Date(selectedArticle.date).toLocaleDateString("en-US", {
-                            month: "long",
-                            day: "numeric",
-                            year: "numeric",
-                          })}
-                        </span>
-                      </div>
-                    )}
-                    {selectedArticle.author && (
-                      <div className={styles.detailsMetaItem}>
-                        <span className={styles.detailsMetaLabel}>Author</span>
-                        <span className={styles.detailsMetaValue}>{selectedArticle.author}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Description/Body */}
-                  {selectedArticle.summary && (
-                    <div className={styles.detailsBody}>
-                      <p>{selectedArticle.summary}</p>
-                    </div>
-                  )}
-
-                  {/* Link button */}
-                  {selectedArticle.link && (
-                    <a
-                      href={selectedArticle.link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={styles.detailsLink}
-                    >
-                      Read Full Article →
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
         </>
       )}
     </section>

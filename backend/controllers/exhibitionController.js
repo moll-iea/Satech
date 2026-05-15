@@ -1,33 +1,4 @@
 const Exhibition = require('../models/Exhibition');
-const cloudinary = require('../config/cloudinary');
-
-const uploadToCloudinary = (fileBuffer, filename, folder = 'satech/exhibitions') => {
-    return new Promise((resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-            {
-                folder,
-                public_id: `${Date.now()}-${filename}`,
-                resource_type: 'image'
-            },
-            (error, result) => {
-                if (error) {
-                    reject(error);
-                    return;
-                }
-                resolve(result);
-            }
-        );
-
-        uploadStream.end(fileBuffer);
-    });
-};
-
-const deleteFromCloudinary = async (publicId) => {
-    if (!publicId) {
-        return;
-    }
-    await cloudinary.uploader.destroy(publicId, { resource_type: 'image' });
-};
 
 exports.getExhibitions = async (req, res) => {
     try {
@@ -50,19 +21,12 @@ exports.getExhibitions = async (req, res) => {
 
 exports.createExhibition = async (req, res) => {
     try {
-        const { name, row, order } = req.body;
+        const { name, link, row, order } = req.body;
 
-        if (!req.file) {
+        if (!name || !link || !row) {
             return res.status(400).json({
                 success: false,
-                message: 'Exhibition image file is required.'
-            });
-        }
-
-        if (!name || !row) {
-            return res.status(400).json({
-                success: false,
-                message: 'Name and row are required.'
+                message: 'Name, link, and row are required.'
             });
         }
 
@@ -73,19 +37,9 @@ exports.createExhibition = async (req, res) => {
             });
         }
 
-        if (!cloudinary.isConfigured) {
-            return res.status(500).json({
-                success: false,
-                message: 'Cloudinary is not configured on the server.'
-            });
-        }
-
-        const uploadedImage = await uploadToCloudinary(req.file.buffer, req.file.originalname);
-
         const exhibition = await Exhibition.create({
             name: name.trim(),
-            image: uploadedImage.secure_url,
-            imagePublicId: uploadedImage.public_id,
+            link: link.trim(),
             row: parseInt(row),
             order: order ? parseInt(order) : 0
         });
@@ -107,7 +61,7 @@ exports.createExhibition = async (req, res) => {
 
 exports.updateExhibition = async (req, res) => {
     try {
-        const { name, row, order } = req.body;
+        const { name, link, row, order } = req.body;
         const updates = {};
 
         const existingExhibition = await Exhibition.findById(req.params.id);
@@ -123,6 +77,10 @@ exports.updateExhibition = async (req, res) => {
             updates.name = name.trim();
         }
 
+        if (typeof link === 'string') {
+            updates.link = link.trim();
+        }
+
         if (row) {
             if (![1, 2].includes(parseInt(row))) {
                 return res.status(400).json({
@@ -135,27 +93,6 @@ exports.updateExhibition = async (req, res) => {
 
         if (order !== undefined) {
             updates.order = parseInt(order);
-        }
-
-        if (req.file) {
-            if (!cloudinary.isConfigured) {
-                return res.status(500).json({
-                    success: false,
-                    message: 'Cloudinary is not configured on the server.'
-                });
-            }
-
-            const uploadedImage = await uploadToCloudinary(req.file.buffer, req.file.originalname);
-            updates.image = uploadedImage.secure_url;
-            updates.imagePublicId = uploadedImage.public_id;
-
-            if (existingExhibition.imagePublicId) {
-                try {
-                    await deleteFromCloudinary(existingExhibition.imagePublicId);
-                } catch (err) {
-                    console.error('Error deleting old image from Cloudinary:', err);
-                }
-            }
         }
 
         const updatedExhibition = await Exhibition.findByIdAndUpdate(
@@ -190,14 +127,6 @@ exports.deleteExhibition = async (req, res) => {
             });
         }
 
-        if (exhibition.imagePublicId) {
-            try {
-                await deleteFromCloudinary(exhibition.imagePublicId);
-            } catch (err) {
-                console.error('Error deleting image from Cloudinary:', err);
-            }
-        }
-
         await Exhibition.findByIdAndDelete(req.params.id);
 
         return res.status(200).json({
@@ -213,3 +142,4 @@ exports.deleteExhibition = async (req, res) => {
         });
     }
 };
+        

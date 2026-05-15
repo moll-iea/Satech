@@ -13,28 +13,14 @@ export default function ExhibitionAdmin() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState(null);
-  const [imageFile, setImageFile] = useState(null);
-  const [imagePreview, setImagePreview] = useState("");
-  const [existingImage, setExistingImage] = useState("");
   const [showForm, setShowForm] = useState(false);
   const [activeRow, setActiveRow] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ name: "", row: 1, order: 0 });
+  const [form, setForm] = useState({ name: "", link: "", row: 1, order: 0 });
 
   useEffect(() => { checkAuth(); loadExhibitions(); }, []);
-
-  useEffect(() => {
-    if (!imageFile) {
-      // Don't wipe the preview if we're editing and have an existing server image
-      setImagePreview(existingImage || "");
-      return;
-    }
-    const url = URL.createObjectURL(imageFile);
-    setImagePreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [imageFile, existingImage]);
 
   const checkAuth = () => {
     if (!localStorage.getItem(TOKEN_KEY)) navigate("/admin/login", { replace: true });
@@ -87,29 +73,42 @@ export default function ExhibitionAdmin() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault(); setError("");
-    if (!form.name.trim()) { setError("Exhibition name is required"); return; }
-    if (!imageFile && !editingId) { setError("Image is required for new exhibitions"); return; }
+    e.preventDefault();
+    setError("");
+    if (!form.name.trim()) {
+      setError("Exhibition name is required");
+      return;
+    }
+    if (!form.link.trim()) {
+      setError("Exhibition link is required");
+      return;
+    }
     try {
-      const fd = new FormData();
-      fd.append("name", form.name.trim());
-      fd.append("row", form.row);
-      fd.append("order", form.order);
-      if (imageFile) fd.append("image", imageFile);
-      if (editingId) await exhibitionService.update(editingId, fd);
-      else await exhibitionService.create(fd);
-      setForm({ name: "", row: 1, order: 0 });
-      setImageFile(null); setEditingId(null); setShowForm(false);
+      const payload = {
+        name: form.name.trim(),
+        link: form.link.trim(),
+        row: form.row,
+        order: form.order
+      };
+      if (editingId) await exhibitionService.update(editingId, payload);
+      else await exhibitionService.create(payload);
+      setForm({ name: "", link: "", row: 1, order: 0 });
+      setEditingId(null);
+      setShowForm(false);
       await loadExhibitions();
-    } catch (err) { setError(err.message); }
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const handleEdit = (ex) => {
     setEditingId(ex._id);
-    setForm({ name: ex.name, row: ex.row, order: ex.order });
-    setImageFile(null);
-    setExistingImage(ex.image || "");
-    setImagePreview(ex.image ? `${import.meta.env.VITE_API_URL}${ex.image}` : "");
+    setForm({
+      name: ex.name || "",
+      link: ex.link || "",
+      row: ex.row || 1,
+      order: ex.order || 0
+    });
     setShowForm(true);
   };
 
@@ -118,13 +117,19 @@ export default function ExhibitionAdmin() {
     try {
       await exhibitionService.delete(id);
       await loadExhibitions();
-      if (editingId === id) { setEditingId(null); setForm({ name: "", row: 1, order: 0 }); setImageFile(null); }
-    } catch (err) { setError(err.message); }
+      if (editingId === id) {
+        setEditingId(null);
+        setForm({ name: "", link: "", row: 1, order: 0 });
+      }
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const handleCancel = () => {
-    setEditingId(null); setForm({ name: "", row: 1, order: 0 });
-    setImageFile(null); setImagePreview(""); setExistingImage(""); setShowForm(false);
+    setEditingId(null);
+    setForm({ name: "", link: "", row: 1, order: 0 });
+    setShowForm(false);
   };
 
   const matchesSearch = (item, term) => {
@@ -132,14 +137,14 @@ export default function ExhibitionAdmin() {
     return item.name.toLowerCase().includes(term.toLowerCase());
   };
 
-  const filtered = activeRow === "all" 
+  const filtered = activeRow === "all"
     ? exhibitions.filter(ex => matchesSearch(ex, searchTerm))
     : exhibitions.filter(ex => ex.row === parseInt(activeRow) && matchesSearch(ex, searchTerm));
-  
-  const rowCounts = { 
-    all: exhibitions.filter(ex => matchesSearch(ex, searchTerm)).length, 
-    1: exhibitions.filter(e => e.row === 1 && matchesSearch(e, searchTerm)).length, 
-    2: exhibitions.filter(e => e.row === 2 && matchesSearch(e, searchTerm)).length 
+
+  const rowCounts = {
+    all: exhibitions.filter(ex => matchesSearch(ex, searchTerm)).length,
+    1: exhibitions.filter(e => e.row === 1 && matchesSearch(e, searchTerm)).length,
+    2: exhibitions.filter(e => e.row === 2 && matchesSearch(e, searchTerm)).length
   };
 
   return (
@@ -164,7 +169,7 @@ export default function ExhibitionAdmin() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className={styles.searchInput}
           />
-          <button onClick={() => { setShowForm(true); setEditingId(null); setImagePreview(""); setExistingImage(""); setImageFile(null); setForm({ name: "", row: 1, order: 0 }); }}
+          <button onClick={() => { setShowForm(true); setEditingId(null); setForm({ name: "", link: "", row: 1, order: 0 }); }}
             className={styles.addBtn}>
             ⊕ New Exhibition
           </button>
@@ -184,27 +189,26 @@ export default function ExhibitionAdmin() {
               </div>
 
               <form onSubmit={handleSubmit} className={styles.form}>
-                {/* Image Upload */}
-                <label className={styles.imageUpload}>
-                  <input type="file" accept="image/*" onChange={e => setImageFile(e.target.files?.[0] || null)} style={{ display: "none" }} />
-                  {(imagePreview) ? (
-                    <div className={styles.imageUploadPreview}>
-                      <img src={imagePreview} alt="Preview" />
-                      <div className={styles.imageUploadOverlay}>Change Image</div>
-                    </div>
-                  ) : (
-                    <div className={styles.imageUploadPlaceholder}>
-                      <span className={styles.imageUploadIcon}>⊞</span>
-                      <span>Upload Exhibition Photo</span>
-                      <span className={styles.imageUploadSub}>Click to browse</span>
-                    </div>
-                  )}
-                </label>
-
                 <div className={styles.fieldGroup}>
                   <label>Exhibition Name *</label>
-                  <input type="text" placeholder="e.g. SEMICON Asia 2024" value={form.name}
-                    onChange={e => setForm({ ...form, name: e.target.value })} required />
+                  <input 
+                    type="text" 
+                    placeholder="e.g. SEMICON Asia 2024" 
+                    value={form.name || ""}
+                    onChange={e => setForm({ ...form, name: e.target.value })} 
+                    required 
+                  />
+                </div>
+
+                <div className={styles.fieldGroup}>
+                  <label>Exhibition Link *</label>
+                  <input 
+                    type="url" 
+                    placeholder="e.g. https://www.semicon.org" 
+                    value={form.link || ""}
+                    onChange={e => setForm({ ...form, link: e.target.value })} 
+                    required 
+                  />
                 </div>
 
                 <div className={styles.fieldRow}>
@@ -226,7 +230,11 @@ export default function ExhibitionAdmin() {
                       <label>Display Order</label>
                       <span className={styles.infoBubble} title="Nagseset ng posisyon ng exhibition na ito sa loob ng row. Lumalabas muna ang mas mababang numero.">ⓘ</span>
                     </div>
-                    <input type="number" value={form.order} onChange={e => setForm({ ...form, order: parseInt(e.target.value) })} />
+                    <input 
+                      type="number" 
+                      value={form.order || 0} 
+                      onChange={e => setForm({ ...form, order: parseInt(e.target.value) || 0 })} 
+                    />
                   </div>
                 </div>
 
@@ -270,9 +278,7 @@ export default function ExhibitionAdmin() {
             {filtered.map(ex => (
               <div key={ex._id} className={styles.galleryCard}>
                 <div className={styles.galleryCardImage}>
-                  {ex.image
-                    ? <img src={ex.image} alt={ex.name} loading="lazy" />
-                    : <span className={styles.noImage}>⬚</span>}
+                  <span className={styles.noImage}>🔗</span>
                   <div className={styles.galleryCardBadges}>
                     <span className={styles.rowBadge}>Row {ex.row}</span>
                     <span className={styles.orderBadge}>#{ex.order}</span>

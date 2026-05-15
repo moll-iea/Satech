@@ -6,14 +6,10 @@ const exhibitionSchema = new mongoose.Schema({
         required: [true, 'Please provide an exhibition name'],
         trim: true
     },
-    image: {
+    link: {
         type: String,
-        required: [true, 'Please provide an exhibition image URL'],
+        required: [true, 'Please provide an exhibition link'],
         trim: true
-    },
-    imagePublicId: {
-        type: String,
-        default: ''
     },
     row: {
         type: Number,

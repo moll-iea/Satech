@@ -30,9 +30,10 @@ export const exhibitionService = {
       const response = await fetch(API_BASE, {
         method: 'POST',
         headers: {
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: exhibitionData,
+        body: JSON.stringify(exhibitionData),
       });
       if (!response.ok) throw new Error('Failed to create exhibition');
       return await response.json();
@@ -48,9 +49,10 @@ export const exhibitionService = {
       const response = await fetch(`${API_BASE}/${id}`, {
         method: 'PUT',
         headers: {
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: exhibitionData,
+        body: JSON.stringify(exhibitionData),
       });
       if (!response.ok) throw new Error('Failed to update exhibition');
       return await response.json();

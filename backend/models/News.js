@@ -13,21 +13,9 @@ const newsSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  summary: {
-    type: String,
-    required: true,
-  },
   link: {
     type: String,
     default: '#',
-  },
-  source: {
-    type: String,
-    default: null,
-  },
-  author: {
-    type: String,
-    default: null,
   },
   createdAt: {
     type: Date,

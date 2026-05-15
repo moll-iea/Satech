@@ -138,6 +138,7 @@
   font-family: var(--font-mono);
   letter-spacing: 0.02em;
   margin: 0;
+  text-align: justify;
 }
 
 /* Nav buttons */

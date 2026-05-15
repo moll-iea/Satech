@@ -1,21 +1,23 @@
 import React, { useEffect, useState } from "react";
 import styles from "./Clients.module.css";
 
-function ExhibitionsTrack({ exhibitions, reverse = false, onSelectExhibition }) {
+function ExhibitionsTrack({ exhibitions, reverse = false }) {
   return (
     <div className={styles.marqueeWrap}>
       <div className={`${styles.track} ${reverse ? styles.reverse : ""}`}>
         {/* group 1 */}
         <div className={styles.group}>
           {exhibitions.map((e, i) => (
-            <button 
+            <a 
               className={styles.badge} 
               key={`a-${i}`}
-              onClick={() => onSelectExhibition(e)}
-              style={{ cursor: 'pointer' }}
+              href={e.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              title={e.name}
             >
               {e.name}
-            </button>
+            </a>
           ))}
         </div>
 
@@ -34,7 +36,6 @@ export default function Exhibitions() {
   const [row1, setRow1] = useState([]);
   const [row2, setRow2] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedExhibition, setSelectedExhibition] = useState(null);
 
   useEffect(() => {
     const fetchExhibitions = async () => {
@@ -76,8 +77,8 @@ export default function Exhibitions() {
             </p>
           </div>
 
-          {!isLoading && row1.length > 0 && <ExhibitionsTrack exhibitions={row1} onSelectExhibition={setSelectedExhibition} />}
-          {!isLoading && row2.length > 0 && <ExhibitionsTrack exhibitions={row2} reverse onSelectExhibition={setSelectedExhibition} />}
+          {!isLoading && row1.length > 0 && <ExhibitionsTrack exhibitions={row1} />}
+          {!isLoading && row2.length > 0 && <ExhibitionsTrack exhibitions={row2} reverse />}
         </div>
 
         <div className={styles.rightContent}>
@@ -88,16 +89,6 @@ export default function Exhibitions() {
           />
         </div>
       </div>
-
-      {selectedExhibition && (
-        <div className={styles.modalOverlay} onClick={() => setSelectedExhibition(null)}>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-            <button className={styles.closeBtn} onClick={() => setSelectedExhibition(null)}>×</button>
-            <h3>{selectedExhibition.name}</h3>
-            <img src={selectedExhibition.image} alt={selectedExhibition.name} />
-          </div>
-        </div>
-      )}
     </section>
   );
 }

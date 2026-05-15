@@ -68,13 +68,14 @@
 .sub {
   font-family: var(--font-mono);
   font-size: 13px;
-  letter-spacing: 10px;
+  letter-spacing: 8px;
   text-transform: uppercase;
-  color: rgba(232, 228, 220, 0.6);
+  color: #ffffff;
   margin-bottom: 24px;
+  margin-top: -35px;
   opacity: 0;
   animation: fadeUp 0.8s 0.5s forwards;
-  padding: 0 100px;
+  padding: 0 215px;
 }
 
 .tagline {
@@ -184,15 +185,7 @@
   position: relative;
   display: inline-block;
   color: #ffd700;
-}
-
-.circleText::before {
-  content: '';
-  position: absolute;
-  inset: -8px -12px;
-  border: 2px solid #ffd700;
-  border-radius: 50%;
-  pointer-events: none;
+  word-spacing: 10px;
 }
 
 .fill {
