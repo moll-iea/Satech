@@ -407,3 +407,84 @@
     font-size: 16px;
   }
 }
+
+@media (max-width: 1024px) {
+  .videos {
+    padding: 40px 0 30px;
+  }
+
+  .heroHeader {
+    margin: 0 auto 32px;
+    max-width: 100%;
+    padding: 0 20px;
+  }
+
+  .heroTitle {
+    font-size: clamp(24px, 3.5vw, 40px);
+  }
+
+  .carouselContainer {
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .card {
+    width: 320px;
+  }
+
+  .arrowBtn {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .videos {
+    padding: 20px 0 10px;
+  }
+
+  .heroHeader {
+    margin: 0 auto 16px;
+    max-width: 100%;
+    padding: 0 12px;
+  }
+
+  .heroTitle {
+    font-size: clamp(16px, 2.5vw, 24px);
+  }
+
+  .carouselContainer {
+    padding: 0 8px;
+    gap: 8px;
+  }
+
+  .track {
+    gap: 10px;
+  }
+
+  .card {
+    width: calc(100vw - 32px);
+    max-width: 200px;
+    border-radius: 8px;
+  }
+
+  .cardTitle {
+    font-size: 13px;
+  }
+
+  .cardDesc {
+    font-size: 11px;
+  }
+
+  .arrowBtn {
+    width: 36px;
+    height: 36px;
+    font-size: 14px;
+  }
+
+  .modalClose {
+    width: 28px;
+    height: 28px;
+    font-size: 16px;
+  }
+}

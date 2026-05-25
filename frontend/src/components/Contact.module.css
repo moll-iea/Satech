@@ -133,7 +133,37 @@
   line-height: 1.7;
 }
 
-@media (max-width: 900px) {
-  .contact { padding: 80px 24px; }
-  .inner { grid-template-columns: 1fr; }
+@media (max-width: 1024px) {
+  .contact { padding: 60px 40px; }
+  .inner { grid-template-columns: 1fr; gap: 60px; }
+  .contact::before { font-size: 200px; }
+}
+
+@media (max-width: 768px) {
+  .contact { padding: 40px 20px; }
+  .inner { grid-template-columns: 1fr; gap: 40px; }
+  .title { font-size: clamp(36px, 5vw, 56px); }
+  .sub { font-size: 14px; margin-bottom: 24px; }
+  .contact::before { font-size: 150px; right: -20px; bottom: -40px; }
+  .formGroup input,
+  .formGroup textarea { font-size: 13px; padding: 12px 16px; }
+  .btnDark { padding: 12px 30px; font-size: 11px; }
+}
+
+@media (max-width: 480px) {
+  .contact { padding: 30px 16px; }
+  .inner { grid-template-columns: 1fr; gap: 24px; }
+  .title { font-size: clamp(24px, 4vw, 40px); }
+  .sub { font-size: 13px; margin-bottom: 16px; }
+  .detailIcon { width: 40px; height: 40px; font-size: 18px; }
+  .detailLabel { font-size: 9px; }
+  .detailVal { font-size: 13px; }
+  .contact::before { font-size: 100px; }
+  .formGroup { margin-bottom: 16px; }
+  .formGroup input,
+  .formGroup textarea { font-size: 12px; padding: 10px 12px; }
+  .formGroup textarea { height: 100px; }
+  .btnDark { padding: 10px 24px; font-size: 10px; }
+  .successTitle { font-size: 32px; }
+  .successMsg { font-size: 13px; }
 }

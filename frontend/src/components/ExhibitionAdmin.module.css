@@ -684,3 +684,67 @@
   .downloadControls { flex-direction: column; padding: 1rem; }
   .downloadBtn { width: 100%; }
 }
+
+/* ════════════════════════════════════════════════════════════
+   Mobile Responsive (max-width: 480px)
+════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .shell {
+    font-size: 12px;
+  }
+
+  .topnav {
+    padding: 0.6rem 0.8rem;
+    flex-wrap: wrap;
+  }
+
+  .topnavTitle h1 {
+    font-size: 0.8rem;
+  }
+
+  .addBtn {
+    font-size: 0.7rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .body {
+    padding: 0.8rem;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .formGroup {
+    margin-bottom: 0.8rem;
+  }
+
+  .galleryGrid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .fieldRow {
+    grid-template-columns: 1fr;
+  }
+
+  .table {
+    font-size: 11px;
+    overflow-x: auto;
+  }
+
+  th, td {
+    padding: 0.4rem 0.6rem;
+  }
+
+  .downloadControls {
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.8rem;
+  }
+
+  .downloadBtn {
+    width: 100%;
+    font-size: 11px;
+  }
+}

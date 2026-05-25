@@ -679,53 +679,158 @@ line-clamp: 2;
   transform: translateX(4px) scale(0.98);
 }
 
-@media (max-width: 768px) {
-  .detailsContent {
-    padding: 24px;
-    gap: 16px;
+
+
+/* ════════════════════════════════════════════════════════════
+   Mobile Responsive (max-width: 1024px)
+════════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .contentLayout {
+    grid-template-columns: 280px 1fr;
+    gap: 32px;
   }
 
-  .detailsTitle {
-    font-size: 24px;
+  .title {
+    font-size: clamp(24px, 4vw, 40px);
   }
 
-  .detailsMeta {
-    gap: 16px;
-  }
-
-  .detailsImageWrap {
-    aspect-ratio: 16 / 10;
+  .header {
+    margin-bottom: 40px;
   }
 }
 
-@media (max-width: 640px) {
-  .detailsModal {
-    max-width: 95vw;
-    max-height: 95vh;
-    border-radius: 0px;
+/* ════════════════════════════════════════════════════════════
+   Mobile Responsive (max-width: 768px)
+════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .global {
+    padding: 30px 16px;
   }
 
-  .detailsImageWrap {
-    aspect-ratio: 4 / 3;
-    border-radius: 0px;
-  }
-
-  .detailsContent {
-    padding: 16px;
+  .header {
+    margin-bottom: 32px;
     gap: 12px;
   }
 
-  .detailsTitle {
-    font-size: 18px;
+  .title {
+    font-size: clamp(20px, 3.5vw, 32px);
   }
 
-  .detailsMeta {
-    flex-direction: column;
-    gap: 12px;
-    padding-bottom: 12px;
+  .desc {
+    font-size: 13px;
+  }
+
+  .filterRow {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .filterBtn {
+    font-size: 10px;
+    padding: 6px 14px;
+  }
+
+  .filterCount {
+    font-size: 10px;
+  }
+
+  .contentLayout {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  .sidebar {
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .cardsGrid {
+    gap: 16px;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  .card {
+    height: 240px;
+  }
+
+  .cardImage {
+    height: 140px;
+  }
+
+  .cardTitle {
+    font-size: 13px;
   }
 
   .detailsBody {
-    font-size: 13px;
+    font-size: 12px;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   Mobile Responsive (max-width: 480px)
+════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .global {
+    padding: 20px 12px;
+  }
+
+  .header {
+    margin-bottom: 24px;
+    gap: 10px;
+  }
+
+  .title {
+    font-size: clamp(16px, 3vw, 24px);
+  }
+
+  .desc {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .filterRow {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .filterBtn {
+    font-size: 9px;
+    padding: 5px 10px;
+  }
+
+  .filterCount {
+    font-size: 9px;
+  }
+
+  .contentLayout {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .sidebar {
+    padding: 12px;
+    max-height: none;
+  }
+
+  .cardsGrid {
+    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+
+  .card {
+    height: 200px;
+  }
+
+  .cardImage {
+    height: 110px;
+  }
+
+  .cardTitle {
+    font-size: 12px;
+  }
+
+  .detailsBody {
+    font-size: 11px;
   }
 }

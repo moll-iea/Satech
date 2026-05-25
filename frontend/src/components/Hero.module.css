@@ -182,18 +182,78 @@
   to   { opacity: 1; transform: translateY(0); }
 }
 
-@media (max-width: 900px) {
-  .hero { padding: 100px 24px 100px; }
+@media (max-width: 1024px) {
+  .hero { padding: 80px 40px 80px; }
+  .title { font-size: clamp(200px, 12vw, 280px); }
+  .sub { 
+    font-size: 20px;
+    letter-spacing: 3px;
+    padding: 0 100px;
+    margin-top: -20px;
+  }
+  .tagline { font-size: clamp(24px, 3.5vw, 60px); }
   .stats {
     position: static; margin-top: 48px;
     justify-content: flex-start;
+    gap: 32px;
   }
+  .statNum { font-size: 40px; }
   .brandLockup {
     position: static;
     margin-top: 24px;
     flex-wrap: wrap;
     gap: 8px;
   }
+}
+
+@media (max-width: 768px) {
+  .hero { padding: 80px 20px 60px; }
+  .title { font-size: clamp(120px, 10vw, 180px); }
+  .sub { 
+    font-size: 16px;
+    letter-spacing: 2px;
+    padding: 0 40px;
+    margin-top: -15px;
+  }
+  .tagline { font-size: clamp(18px, 3vw, 40px); }
+  .tag { 
+    font-size: 10px;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+  }
+  .grid { background-size: 40px 40px; }
+  .stats {
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .statNum { font-size: 32px; }
+  .statLabel { font-size: 9px; }
+}
+
+@media (max-width: 480px) {
+  .hero { padding: 60px 16px 40px; }
+  .title { font-size: clamp(60px, 8vw, 100px); }
+  .sub { 
+    font-size: 13px;
+    letter-spacing: 1px;
+    padding: 0 10px;
+    margin-top: -8px;
+  }
+  .tagline { font-size: clamp(16px, 2.5vw, 28px); }
+  .tag { 
+    font-size: 9px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .grid { background-size: 30px 30px; }
+  .stats {
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .statNum { font-size: 24px; }
+  .statLabel { font-size: 8px; }
+  .brandName { font-size: 11px; }
+  .brandSub { font-size: 10px; }
 }
 
 .circleText {

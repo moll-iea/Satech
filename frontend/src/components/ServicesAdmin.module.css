@@ -389,3 +389,44 @@
     max-width: 95vw;
   }
 }
+
+/* ════════════════════════════════════════════════════════════
+   Mobile Responsive (max-width: 480px)
+════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .shell {
+    font-size: 12px;
+  }
+
+  .topnav {
+    padding: 0.6rem 0.8rem;
+  }
+
+  .body {
+    padding: 0.8rem;
+  }
+
+  .form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.8rem;
+  }
+
+  .formGroup {
+    margin-bottom: 0;
+  }
+
+  .table {
+    font-size: 11px;
+    overflow-x: auto;
+  }
+
+  th, td {
+    padding: 0.4rem 0.6rem;
+  }
+
+  .modalContent {
+    max-width: 100vw;
+    padding: 1.2rem;
+  }
+}

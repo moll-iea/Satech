@@ -624,3 +624,32 @@
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(124, 58, 237, 0.3);
 }
+
+/* ════════════════════════════════════════════════════════════
+   Mobile Responsive
+════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .container {
+    gap: 20px;
+  }
+
+  .table {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .formGroup {
+    margin-bottom: 12px;
+  }
+
+  .table {
+    font-size: 11px;
+    overflow-x: auto;
+  }
+}

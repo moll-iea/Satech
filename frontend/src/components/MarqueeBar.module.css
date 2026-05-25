@@ -34,3 +34,40 @@
     transform: translateX(-50%); 
   }
 }
+
+/* ════════════════════════════════════════════════════════════
+   Mobile Responsive
+════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .bar {
+    padding: 10px 0;
+  }
+
+  .item {
+    font-size: 14px;
+    letter-spacing: 2px;
+    padding: 0 24px;
+  }
+
+  .dot {
+    font-size: 12px;
+    padding: 0 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .bar {
+    padding: 8px 0;
+  }
+
+  .item {
+    font-size: 12px;
+    letter-spacing: 1px;
+    padding: 0 16px;
+  }
+
+  .dot {
+    font-size: 10px;
+    padding: 0 6px;
+  }
+}

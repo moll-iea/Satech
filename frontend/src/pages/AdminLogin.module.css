@@ -92,6 +92,75 @@
   opacity: 0.72;
 }
 
+/* ════════════════════════════════════════════════════════════
+   Mobile Responsive
+════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .page {
+    padding: 1.5rem;
+  }
+
+  .card {
+    width: min(420px, 100%);
+    padding: 1.5rem;
+    border-radius: 16px;
+  }
+
+  .title {
+    font-size: 1.75rem;
+  }
+
+  .input {
+    font-size: 15px;
+  }
+
+  .button {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page {
+    padding: 1rem;
+  }
+
+  .card {
+    width: 100%;
+    padding: 1.25rem;
+    border-radius: 12px;
+  }
+
+  .tag {
+    font-size: 0.7rem;
+  }
+
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+  }
+
+  .form {
+    gap: 0.7rem;
+  }
+
+  .label {
+    font-size: 0.8rem;
+  }
+
+  .input {
+    font-size: 14px;
+    padding: 0.7rem 0.9rem;
+  }
+
+  .button {
+    font-size: 13px;
+    padding: 0.65rem 0.9rem;
+  }
+}
+
 .footerText {
   margin: 1rem 0 0;
   color: #57695e;

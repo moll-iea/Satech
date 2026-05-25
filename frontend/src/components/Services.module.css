@@ -321,6 +321,194 @@
   transition: opacity 0.4s ease, transform 0.4s ease;
 }
 
+/* ════════════════════════════════════════════════════════════
+   Mobile Responsive (max-width: 1024px)
+════════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .services {
+    padding: 40px 40px 20px;
+  }
+
+  .heading {
+    font-size: clamp(28px, 4vw, 48px);
+  }
+
+  .carouselWrap {
+    flex-direction: column;
+  }
+
+  .sideCol {
+    width: 100%;
+    padding-right: 0;
+    gap: 24px;
+  }
+
+  .carousel {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .tabBar {
+    padding: 0 12px;
+    margin-bottom: 32px;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   Mobile Responsive (max-width: 768px)
+════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .services {
+    padding: 30px 20px 15px;
+  }
+
+  .intro {
+    margin-bottom: 28px;
+  }
+
+  .label {
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    margin-bottom: 16px;
+  }
+
+  .heading {
+    font-size: clamp(24px, 3.5vw, 36px);
+    margin-bottom: 12px;
+  }
+
+  .introDesc {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .tabBar {
+    padding: 0 8px;
+    margin-bottom: 24px;
+    gap: 0;
+  }
+
+  .tabItem {
+    padding: 10px 16px;
+    font-size: 11px;
+    letter-spacing: 0.02em;
+  }
+
+  .carouselWrap {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .sideCol {
+    width: 100%;
+    padding-right: 0;
+    padding-bottom: 24px;
+    gap: 20px;
+  }
+
+  .sideDesc {
+    font-size: 12px;
+    line-height: 1.6;
+  }
+
+  .navBtn {
+    width: 36px;
+    height: 36px;
+  }
+
+  .carousel {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .card {
+    height: 280px;
+  }
+
+  .cardTitle {
+    font-size: 16px;
+  }
+
+  .desc {
+    font-size: 12px;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   Mobile Responsive (max-width: 480px)
+════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .services {
+    padding: 20px 12px 10px;
+  }
+
+  .intro {
+    margin-bottom: 20px;
+  }
+
+  .label {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    margin-bottom: 12px;
+  }
+
+  .heading {
+    font-size: clamp(18px, 3vw, 28px);
+    margin-bottom: 8px;
+  }
+
+  .introDesc {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .tabBar {
+    padding: 0 6px;
+    margin-bottom: 16px;
+  }
+
+  .tabItem {
+    padding: 8px 12px;
+    font-size: 10px;
+  }
+
+  .sideCol {
+    width: 100%;
+    padding-bottom: 16px;
+    gap: 16px;
+  }
+
+  .sideDesc {
+    font-size: 11px;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .navBtn {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
+  .carousel {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .card {
+    height: 240px;
+  }
+
+  .cardTitle {
+    font-size: 14px;
+  }
+
+  .desc {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+}
+
 .card:hover .desc {
   opacity: 1;
   transform: translateY(0);

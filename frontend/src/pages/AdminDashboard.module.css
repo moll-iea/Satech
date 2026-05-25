@@ -1258,3 +1258,114 @@
   gap: 0.4rem;
   flex-shrink: 0;
 }
+
+/* ════════════════════════════════════════════════════════════
+   Mobile Responsive (max-width: 1024px)
+════════════════════════════════════════════════════════════ */
+@media (max-width: 1024px) {
+  .shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid #0d2030;
+  }
+
+  .body {
+    flex: 1;
+    padding: 1.2rem;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   Mobile Responsive (max-width: 768px)
+════════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .shell {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: static;
+  }
+
+  .body {
+    padding: 1rem;
+  }
+
+  .topnav {
+    padding: 0.8rem 1rem;
+    flex-wrap: wrap;
+  }
+
+  .topnavTitle h1 {
+    font-size: 0.9rem;
+  }
+
+  .addBtn {
+    font-size: 0.75rem;
+    padding: 0.5rem 1rem;
+  }
+
+  table {
+    font-size: 12px;
+  }
+
+  th, td {
+    padding: 0.5rem;
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   Mobile Responsive (max-width: 480px)
+════════════════════════════════════════════════════════════ */
+@media (max-width: 480px) {
+  .shell {
+    flex-direction: column;
+  }
+
+  .topnav {
+    padding: 0.6rem 0.8rem;
+    gap: 8px;
+  }
+
+  .topnavTitle h1 {
+    font-size: 0.8rem;
+  }
+
+  .addBtn {
+    font-size: 0.7rem;
+    padding: 0.4rem 0.8rem;
+  }
+
+  .body {
+    padding: 0.8rem;
+  }
+
+  table {
+    font-size: 11px;
+    overflow-x: auto;
+  }
+
+  th, td {
+    padding: 0.4rem 0.6rem;
+  }
+
+  .inqCardCompany {
+    font-size: 0.7rem;
+  }
+
+  .inqCardMeta strong {
+    font-size: 0.75rem;
+  }
+
+  .inqCardMeta span {
+    font-size: 0.65rem;
+  }
+}
