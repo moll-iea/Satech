@@ -1,4 +1,5 @@
-const API_BASE = 'http://localhost:5000/api/exhibitions';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const API_BASE = `${BASE_URL}/api/exhibitions`;
 const TOKEN_KEY = 'satech_admin_token';
 
 export const exhibitionService = {

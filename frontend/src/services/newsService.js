@@ -1,4 +1,5 @@
-const API_BASE = 'http://localhost:5000/api/news';
+const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+const API_BASE = `${BASE_URL}/api/news`;
 
 export const newsService = {
   // Fetch all news

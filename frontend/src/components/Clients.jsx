@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styles from "./Clients.module.css";
+import exhibitionsImg from '/src/assets/exhibitons.png';
 
 function ExhibitionsTrack({ exhibitions, reverse = false }) {
   return (
@@ -83,7 +84,7 @@ export default function Exhibitions() {
 
         <div className={styles.rightContent}>
           <img 
-            src="/images_exxhibitons/exhibitons.png" 
+            src={exhibitionsImg} 
             alt="PCB Exhibition Gallery" 
             className={styles.pcbImage}
           />

@@ -17,6 +17,11 @@ const smtpUser = normalizeEmailValue(process.env.SMTP_USER);
 const smtpPass = normalizeAppPassword(process.env.SMTP_PASS);
 const receiverEmail = normalizeEmailValue(process.env.CONTACT_RECEIVER_EMAIL);
 
+console.log('📧 SMTP Configuration Check:');
+console.log(`  SMTP_USER: ${smtpUser ? '✓ Set' : '✗ Missing'}`);
+console.log(`  SMTP_PASS: ${smtpPass ? '✓ Set (' + smtpPass.length + ' chars)' : '✗ Missing'}`);
+console.log(`  CONTACT_RECEIVER_EMAIL: ${receiverEmail ? '✓ Set' : '✗ Missing'}`);
+
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
     port: 465,
@@ -30,13 +35,28 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+// Verify transporter connection
+transporter.verify((error, success) => {
+    if (error) {
+        console.error('❌ SMTP Connection Error:', error.message);
+    } else {
+        console.log('✅ SMTP Connection Verified Successfully');
+    }
+});
+
 const sendContactEmail = async ({ name, email, company, message, createdAt }) => {
     const missing = getMissingEnv(contactRequiredEnv);
     if (missing.length) {
+        console.error('Missing environment variables:', missing);
         throw new Error(`Missing email config: ${missing.join(', ')}`);
     }
 
     if (!smtpUser || !smtpPass || !receiverEmail) {
+        console.error('SMTP Configuration incomplete:', { 
+            smtpUser: !!smtpUser, 
+            smtpPass: !!smtpPass, 
+            receiverEmail: !!receiverEmail 
+        });
         throw new Error('SMTP configuration is incomplete or invalid.');
     }
 
@@ -63,14 +83,21 @@ const sendContactEmail = async ({ name, email, company, message, createdAt }) =>
       <p>${message.replace(/\n/g, '<br/>')}</p>
     `;
 
-    await transporter.sendMail({
-        from: `Satech Contact Form <${smtpUser}>`,
-        to: receiverEmail,
-        replyTo: email,
-        subject,
-        text: textBody,
-        html: htmlBody
-    });
+    console.log('📤 Attempting to send email to:', receiverEmail);
+    try {
+        const info = await transporter.sendMail({
+            from: `Satech Contact Form <${smtpUser}>`,
+            to: receiverEmail,
+            replyTo: email,
+            subject,
+            text: textBody,
+            html: htmlBody
+        });
+        console.log('✅ Email sent successfully! Message ID:', info.messageId);
+    } catch (err) {
+        console.error('❌ Failed to send email:', err.message);
+        throw err;
+    }
 };
 
 const sendAdminVerificationEmail = async ({ name, email, verificationUrl }) => {

@@ -56,13 +56,14 @@ exports.createContactMessage = async (req, res) => {
                 createdAt: savedMessage.createdAt
             }
         });
-    } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: 'Message saved but email delivery failed. Please check server email configuration.',
-            error: error.message
-        });
-    }
+   } catch (error) {
+    console.error('❌ Contact form error:', error); // change this line - log full error
+    return res.status(500).json({
+        success: false,
+        message: 'Message saved but email delivery failed. Please check server email configuration.',
+        error: error.message
+    });
+}
 };
 
 exports.getContactMessages = async (req, res) => {
