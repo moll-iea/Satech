@@ -40,17 +40,20 @@ exports.createContactMessage = async (req, res) => {
             message: message.trim()
         });
 
-        await sendContactEmail({
+        // Send email asynchronously (non-blocking) - don't await
+        sendContactEmail({
             name: savedMessage.name,
             email: savedMessage.email,
             company: savedMessage.company,
             message: savedMessage.message,
             createdAt: savedMessage.createdAt
+        }).catch(err => {
+            console.error('⚠️  Email sending failed (message still saved):', err.message);
         });
 
         return res.status(201).json({
             success: true,
-            message: 'Message sent successfully.',
+            message: 'Message received successfully. We will respond shortly.',
             data: {
                 id: savedMessage._id,
                 createdAt: savedMessage.createdAt

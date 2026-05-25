@@ -24,11 +24,8 @@ console.log(`  CONTACT_RECEIVER_EMAIL: ${receiverEmail ? '✓ Set' : '✗ Missin
 
 const transporter = nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    tls: {
-        rejectUnauthorized: false
-    },
+    port: 587,
+    secure: false,
     auth: {
         user: smtpUser,
         pass: smtpPass
