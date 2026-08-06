@@ -3,7 +3,7 @@ const Exhibition = require('../models/Exhibition');
 exports.getExhibitions = async (req, res) => {
     try {
         const exhibitions = await Exhibition.find()
-            .sort({ row: 1, order: 1, createdAt: 1 });
+            .sort({ order: 1, createdAt: 1 });
 
         return res.status(200).json({
             success: true,
@@ -21,27 +21,20 @@ exports.getExhibitions = async (req, res) => {
 
 exports.createExhibition = async (req, res) => {
     try {
-        const { name, link, row, order } = req.body;
+        const { name, link, order } = req.body;
 
-        if (!name || !link || !row) {
+        if (!name || !link) {
             return res.status(400).json({
                 success: false,
-                message: 'Name, link, and row are required.'
-            });
-        }
-
-        if (![1, 2].includes(parseInt(row))) {
-            return res.status(400).json({
-                success: false,
-                message: 'Row must be 1 or 2.'
+                message: 'Name and link are required.'
             });
         }
 
         const exhibition = await Exhibition.create({
             name: name.trim(),
             link: link.trim(),
-            row: parseInt(row),
-            order: order ? parseInt(order) : 0
+            order: order ? parseInt(order) : 0,
+            imageUrl: req.file ? req.file.path : ""
         });
 
         return res.status(201).json({
@@ -61,7 +54,7 @@ exports.createExhibition = async (req, res) => {
 
 exports.updateExhibition = async (req, res) => {
     try {
-        const { name, link, row, order } = req.body;
+        const { name, link, order } = req.body;
         const updates = {};
 
         const existingExhibition = await Exhibition.findById(req.params.id);
@@ -81,18 +74,12 @@ exports.updateExhibition = async (req, res) => {
             updates.link = link.trim();
         }
 
-        if (row) {
-            if (![1, 2].includes(parseInt(row))) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Row must be 1 or 2.'
-                });
-            }
-            updates.row = parseInt(row);
-        }
-
         if (order !== undefined) {
             updates.order = parseInt(order);
+        }
+
+        if (req.file) {
+            updates.imageUrl = req.file.path;
         }
 
         const updatedExhibition = await Exhibition.findByIdAndUpdate(
@@ -142,4 +129,3 @@ exports.deleteExhibition = async (req, res) => {
         });
     }
 };
-        

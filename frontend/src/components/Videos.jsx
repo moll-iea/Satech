@@ -117,7 +117,7 @@ export default function Videos() {
   return (
     <section className={styles.videos} ref={ref}>
       <div className={styles.heroHeader}>
-        <h2 className={styles.heroTitle}>Our <em>Videos</em></h2>
+        <h2 className={styles.heroTitle}>Solutions <em> in Action</em></h2>
       </div>
 
       <div className={styles.carouselContainer}>

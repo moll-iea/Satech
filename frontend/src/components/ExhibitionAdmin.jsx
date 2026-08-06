@@ -14,13 +14,24 @@ export default function ExhibitionAdmin() {
   const [error, setError] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [showForm, setShowForm] = useState(false);
-  const [activeRow, setActiveRow] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
 
-  const [form, setForm] = useState({ name: "", link: "", row: 1, order: 0 });
+  const [form, setForm] = useState({ name: "", link: "", order: 0, image: null });
+  const [imagePreview, setImagePreview] = useState("");
 
   useEffect(() => { checkAuth(); loadExhibitions(); }, []);
+
+  useEffect(() => {
+    if (!form.image || typeof form.image === 'string') return;
+    const url = URL.createObjectURL(form.image);
+    setImagePreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [form.image]);
+
+  const handleFileChange = (e) => {
+    setForm(prev => ({ ...prev, image: e.target.files[0] }));
+  };
 
   const checkAuth = () => {
     if (!localStorage.getItem(TOKEN_KEY)) navigate("/admin/login", { replace: true });
@@ -42,14 +53,14 @@ export default function ExhibitionAdmin() {
     doc.text('Exhibition Gallery', 14, yPos);
     yPos += 15;
     doc.setFontSize(10);
-    
+
     filtered.forEach(item => {
       doc.setFont(undefined, 'bold');
       doc.text(`${item.name}`, 14, yPos);
       yPos += 6;
       doc.setFont(undefined, 'normal');
       doc.setTextColor(100);
-      doc.text(`Row ${item.row} | Order #${item.order}`, 14, yPos);
+      doc.text(`Order #${item.order}`, 14, yPos);
       yPos += 8;
       doc.setTextColor(0);
       if (yPos > 270) { doc.addPage(); yPos = 20; }
@@ -61,10 +72,9 @@ export default function ExhibitionAdmin() {
   const downloadExcel = () => {
     const data = filtered.map(item => ({
       Name: item.name,
-      Row: item.row,
       'Display Order': item.order
     }));
-    
+
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Exhibitions');
@@ -84,15 +94,16 @@ export default function ExhibitionAdmin() {
       return;
     }
     try {
-      const payload = {
-        name: form.name.trim(),
-        link: form.link.trim(),
-        row: form.row,
-        order: form.order
-      };
-      if (editingId) await exhibitionService.update(editingId, payload);
-      else await exhibitionService.create(payload);
-      setForm({ name: "", link: "", row: 1, order: 0 });
+      const data = new FormData();
+      data.append("name", form.name.trim());
+      data.append("link", form.link.trim());
+      data.append("order", form.order);
+      if (form.image instanceof File) data.append("image", form.image);
+
+      if (editingId) await exhibitionService.update(editingId, data);
+      else await exhibitionService.create(data);
+      setForm({ name: "", link: "", order: 0, image: null });
+      setImagePreview("");
       setEditingId(null);
       setShowForm(false);
       await loadExhibitions();
@@ -106,9 +117,10 @@ export default function ExhibitionAdmin() {
     setForm({
       name: ex.name || "",
       link: ex.link || "",
-      row: ex.row || 1,
-      order: ex.order || 0
+      order: ex.order || 0,
+      image: null
     });
+    setImagePreview(ex.imageUrl || "");
     setShowForm(true);
   };
 
@@ -119,7 +131,8 @@ export default function ExhibitionAdmin() {
       await loadExhibitions();
       if (editingId === id) {
         setEditingId(null);
-        setForm({ name: "", link: "", row: 1, order: 0 });
+        setForm({ name: "", link: "", order: 0, image: null });
+        setImagePreview("");
       }
     } catch (err) {
       setError(err.message);
@@ -128,7 +141,8 @@ export default function ExhibitionAdmin() {
 
   const handleCancel = () => {
     setEditingId(null);
-    setForm({ name: "", link: "", row: 1, order: 0 });
+    setForm({ name: "", link: "", order: 0, image: null });
+    setImagePreview("");
     setShowForm(false);
   };
 
@@ -137,15 +151,7 @@ export default function ExhibitionAdmin() {
     return item.name.toLowerCase().includes(term.toLowerCase());
   };
 
-  const filtered = activeRow === "all"
-    ? exhibitions.filter(ex => matchesSearch(ex, searchTerm))
-    : exhibitions.filter(ex => ex.row === parseInt(activeRow) && matchesSearch(ex, searchTerm));
-
-  const rowCounts = {
-    all: exhibitions.filter(ex => matchesSearch(ex, searchTerm)).length,
-    1: exhibitions.filter(e => e.row === 1 && matchesSearch(e, searchTerm)).length,
-    2: exhibitions.filter(e => e.row === 2 && matchesSearch(e, searchTerm)).length
-  };
+  const filtered = exhibitions.filter(ex => matchesSearch(ex, searchTerm));
 
   return (
     <div className={styles.shell}>
@@ -169,7 +175,7 @@ export default function ExhibitionAdmin() {
             onChange={(e) => setSearchTerm(e.target.value)}
             className={styles.searchInput}
           />
-          <button onClick={() => { setShowForm(true); setEditingId(null); setForm({ name: "", link: "", row: 1, order: 0 }); }}
+          <button onClick={() => { setShowForm(true); setEditingId(null); setImagePreview(""); setForm({ name: "", link: "", order: 0, image: null }); }}
             className={styles.addBtn}>
             ⊕ New Exhibition
           </button>
@@ -189,53 +195,54 @@ export default function ExhibitionAdmin() {
               </div>
 
               <form onSubmit={handleSubmit} className={styles.form}>
+                <label className={styles.imageUpload}>
+                  <input type="file" accept="image/*" onChange={handleFileChange} style={{ display: "none" }} />
+                  {imagePreview ? (
+                    <div className={styles.imageUploadPreview}>
+                      <img src={imagePreview} alt="Preview" />
+                      <div className={styles.imageUploadOverlay}>Change Image</div>
+                    </div>
+                  ) : (
+                    <div className={styles.imageUploadPlaceholder}>
+                      <span className={styles.imageUploadIcon}>◎</span>
+                      <span>Upload Exhibition Image</span>
+                      <span className={styles.imageUploadSub}>Click to browse</span>
+                    </div>
+                  )}
+                </label>
+
                 <div className={styles.fieldGroup}>
                   <label>Exhibition Name *</label>
-                  <input 
-                    type="text" 
-                    placeholder="e.g. SEMICON Asia 2024" 
+                  <input
+                    type="text"
+                    placeholder="e.g. SEMICON Asia 2024"
                     value={form.name || ""}
-                    onChange={e => setForm({ ...form, name: e.target.value })} 
-                    required 
+                    onChange={e => setForm({ ...form, name: e.target.value })}
+                    required
                   />
                 </div>
 
                 <div className={styles.fieldGroup}>
                   <label>Exhibition Link *</label>
-                  <input 
-                    type="url" 
-                    placeholder="e.g. https://www.semicon.org" 
+                  <input
+                    type="url"
+                    placeholder="e.g. https://www.semicon.org"
                     value={form.link || ""}
-                    onChange={e => setForm({ ...form, link: e.target.value })} 
-                    required 
+                    onChange={e => setForm({ ...form, link: e.target.value })}
+                    required
                   />
                 </div>
 
-                <div className={styles.fieldRow}>
-                  <div className={styles.fieldGroup}>
-                    <div className={styles.labelWithInfo}>
-                      <label>Gallery Row</label>
-                      <span className={styles.infoBubble} title="Row 1: Pangunahing gallery section para sa featured exhibitions. Row 2: Secondary gallery section para sa karagdagang exhibitions.">ⓘ</span>
-                    </div>
-                    <div className={styles.segmentControl}>
-                      {[1, 2].map(r => (
-                        <button key={r} type="button"
-                          className={`${styles.segment} ${form.row === r ? styles.segmentActive : ""}`}
-                          onClick={() => setForm({ ...form, row: r })}>Row {r}</button>
-                      ))}
-                    </div>
+                <div className={styles.fieldGroup}>
+                  <div className={styles.labelWithInfo}>
+                    <label>Display Order</label>
+                    <span className={styles.infoBubble} title="Nagseset ng posisyon ng exhibition na ito. Lumalabas muna ang mas mababang numero.">ⓘ</span>
                   </div>
-                  <div className={styles.fieldGroup}>
-                    <div className={styles.labelWithInfo}>
-                      <label>Display Order</label>
-                      <span className={styles.infoBubble} title="Nagseset ng posisyon ng exhibition na ito sa loob ng row. Lumalabas muna ang mas mababang numero.">ⓘ</span>
-                    </div>
-                    <input 
-                      type="number" 
-                      value={form.order || 0} 
-                      onChange={e => setForm({ ...form, order: parseInt(e.target.value) || 0 })} 
-                    />
-                  </div>
+                  <input
+                    type="number"
+                    value={form.order || 0}
+                    onChange={e => setForm({ ...form, order: parseInt(e.target.value) || 0 })}
+                  />
                 </div>
 
                 <div className={styles.formActions}>
@@ -248,18 +255,6 @@ export default function ExhibitionAdmin() {
             </div>
           </div>
         )}
-
-        {/* Filter Tabs */}
-        <div className={styles.filterBar}>
-          {[{ id: "all", label: "All" }, { id: "1", label: "Row 1" }, { id: "2", label: "Row 2" }].map(tab => (
-            <button key={tab.id}
-              className={`${styles.filterTab} ${activeRow === tab.id ? styles.filterTabActive : ""}`}
-              onClick={() => setActiveRow(tab.id)}>
-              {tab.label}
-              <span className={styles.filterCount}>{rowCounts[tab.id]}</span>
-            </button>
-          ))}
-        </div>
 
         {/* Gallery Grid */}
         {isLoading ? (
@@ -278,9 +273,12 @@ export default function ExhibitionAdmin() {
             {filtered.map(ex => (
               <div key={ex._id} className={styles.galleryCard}>
                 <div className={styles.galleryCardImage}>
-                  <span className={styles.noImage}>🔗</span>
+                  {ex.imageUrl ? (
+                    <img src={ex.imageUrl} alt={ex.name} loading="lazy" />
+                  ) : (
+                    <span className={styles.noImage}>🔗</span>
+                  )}
                   <div className={styles.galleryCardBadges}>
-                    <span className={styles.rowBadge}>Row {ex.row}</span>
                     <span className={styles.orderBadge}>#{ex.order}</span>
                   </div>
                 </div>

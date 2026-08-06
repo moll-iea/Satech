@@ -11,10 +11,9 @@ const exhibitionSchema = new mongoose.Schema({
         required: [true, 'Please provide an exhibition link'],
         trim: true
     },
-    row: {
-        type: Number,
-        required: [true, 'Please specify row (1 or 2)'],
-        enum: [1, 2]
+    imageUrl: {
+        type: String,
+        default: ""
     },
     order: {
         type: Number,

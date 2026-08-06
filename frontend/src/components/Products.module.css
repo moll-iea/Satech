@@ -184,7 +184,7 @@
 }
 
 .heroTitle em {
-  font-style: italic;
+  font-style: normal;
   color: var(--gold);
   font-family: var(--font-body, 'Cormorant Garamond', Georgia, serif);
 }
@@ -376,6 +376,297 @@
 }
 
 /* ════════════════════════════════════════════════════════════
+   Products Body — two-column layout (left scroll menu + carousel)
+════════════════════════════════════════════════════════════ */
+.productsBody {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 32px;
+  width: min(98vw, 1300px);
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.stageColumn {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── Left-side Process / Capability Rail ──────────────────────
+   No card, no border, no background — just a slim column of
+   icons pushed toward the left edge. Hover reveals the title
+   next to the icon; click opens a floating description panel
+   to the right of the title.
+──────────────────────────────────────────────────────────── */
+.processRailWrap {
+  flex: 0 0 auto;
+  width: 210px;
+  position: sticky;
+  top: 120px;
+  align-self: flex-start;
+  margin-left: -80px; /* pull the rail further toward the page edge */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  max-height: 70vh;
+  z-index: 20;
+}
+
+.processMenu {
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  overflow-x: visible;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  /* fade the top/bottom edges so items don't clip abruptly */
+  mask-image: linear-gradient(to bottom, transparent 0, black 14px, black calc(100% - 14px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, black 14px, black calc(100% - 14px), transparent 100%);
+  padding: 6px 4px;
+}
+
+.processMenu::-webkit-scrollbar {
+  display: none;
+}
+
+/* Small circular scroll-rail controls, shown only when there's
+   more content to reveal in that direction. */
+.processScrollBtn {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 198, 41, 0.3);
+  background: rgba(20, 24, 60, 0.75);
+  backdrop-filter: blur(8px);
+  color: rgba(255, 198, 41, 0.8);
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.processScrollBtn:hover {
+  background: rgba(255, 198, 41, 0.16);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.processScrollBtnHidden {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.8);
+  height: 0;
+  width: 30px;
+  overflow: hidden;
+  margin: 0;
+}
+
+.processItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 4px 10px 4px 4px;
+  border-radius: 24px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.processItem:hover,
+.processItemActive {
+  background: rgba(255, 198, 41, 0.08);
+}
+
+.processIconBtn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: 1px solid rgba(255, 198, 41, 0.25);
+  color: rgba(255, 198, 41, 0.75);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.processItem:hover .processIconBtn,
+.processIconBtn:focus-visible {
+  background: rgba(255, 198, 41, 0.12);
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: scale(1.06);
+  outline: none;
+}
+
+.processItemOpen .processIconBtn {
+  background: rgba(255, 198, 41, 0.2);
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.processIconSvg {
+  width: 22px;
+  height: 22px;
+}
+
+/* Title label — now always visible next to its icon (not just on
+   hover). The description popover is what appears on hover instead. */
+.processTitleInline {
+  font-family: var(--font-display, 'Cinzel', 'Georgia', serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.85);
+  transition: color 0.2s ease;
+}
+
+.processItem:hover .processTitleInline,
+.processItemActive .processTitleInline {
+  color: var(--gold);
+}
+
+/* Description popover — rendered through a React portal directly under
+   <body>, so it's laid out with position: fixed. Placement (left/top/
+   width/transform) is computed in JS and passed via inline style;
+   everything below is just the visual skin. Kept out of the scrollable
+   .processMenu container entirely, so overflow clipping never applies. */
+.processPopover {
+  padding: 16px 18px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 198, 41, 0.28);
+  background: rgba(20, 24, 60, 0.92);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+  z-index: 100;
+}
+
+.processPopoverArrow {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: rgba(20, 24, 60, 0.92);
+  border-left: 1px solid rgba(255, 198, 41, 0.28);
+  border-bottom: 1px solid rgba(255, 198, 41, 0.28);
+}
+
+.processPopoverClose {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.processPopoverClose:hover {
+  color: var(--gold);
+}
+
+.processPopoverTitle {
+  font-family: var(--font-display, 'Cinzel', 'Georgia', serif);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 8px;
+  padding-right: 16px;
+}
+
+.processPopoverImage {
+  display: block;
+  width: 100%;
+  height: 84px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(255, 198, 41, 0.2);
+}
+
+.processPopoverDesc {
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+/* ── Responsive: rail becomes a horizontal strip above the carousel ── */
+@media (max-width: 900px) {
+  .productsBody {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 24px;
+  }
+
+  .processRailWrap {
+    position: relative;
+    top: 0;
+    left: 0;
+    margin-left: 0;
+    width: 100%;
+    max-height: none;
+    flex-direction: row;
+  }
+
+  .processMenu {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    overflow-y: visible;
+    overflow-x: visible;
+    max-height: none;
+    justify-content: center;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+
+  /* Each icon+title row becomes a compact wrapping chip on narrow
+     layouts instead of a full-width row. */
+  .processItem {
+    width: auto;
+    flex: 0 0 auto;
+  }
+
+  .processTitleInline {
+    white-space: nowrap;
+  }
+
+  /* Vertical up/down scrolling no longer applies once the rail wraps
+     into a horizontal strip — the browser's own wrapping handles
+     overflow, so the arrow controls stay hidden here. */
+  .processScrollBtn {
+    display: none;
+  }
+}
+
+/* Note: popover width at ≤480px is now driven by JS (POPOVER_WIDTH_SM
+   in ProcessMenu.jsx) via inline style, since placement/sizing must be
+   computed together against the live anchor rect. */
+
+/* ════════════════════════════════════════════════════════════
    TRUE 360° Carousel — Rotating Drum Architecture
 ════════════════════════════════════════════════════════════ */
 
@@ -453,7 +744,7 @@
 .cardActive {
   opacity: 1;
   filter: none;
-  cursor: pointer;
+  cursor: default;
   box-shadow:
     0 30px 80px rgba(0, 0, 0, 0.45),
     0 0 0 1.5px rgba(201, 168, 76, 0.55),
@@ -498,28 +789,45 @@
 .cardCaption {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    to top,
-    rgba(5, 10, 40, 0.97) 0%,
-    rgba(10, 20, 65, 0.65) 42%,
-    rgba(15, 28, 70, 0.15) 72%,
-    transparent 100%
-  );
+  background: transparent;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  padding: 28px 22px;
+  justify-content: flex-start;
+  align-items: flex-end;
+  padding: 18px 18px;
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(10px);
   transition:
     opacity 0.45s ease,
     transform 0.45s ease;
   z-index: 2;
+  text-align: right;
+}
+
+.cardActive:hover .cardCaption,
+.cardActive:focus-within .cardCaption {
+  background: linear-gradient(
+    to top,
+    rgba(5, 10, 40, 0.88) 0%,
+    rgba(10, 20, 65, 0.56) 42%,
+    rgba(15, 28, 70, 0.12) 72%,
+    transparent 100%
+  );
 }
 
 .cardActive .cardCaption {
   opacity: 1;
   transform: translateY(0);
+}
+
+.cardActive:hover .cardCaption {
+  background: linear-gradient(
+    to top,
+    rgba(5, 10, 40, 0.99) 0%,
+    rgba(10, 20, 65, 0.85) 42%,
+    rgba(15, 28, 70, 0.35) 72%,
+    transparent 100%
+  );
 }
 
 .cardTag {
@@ -532,23 +840,56 @@
 
 .cardTitle {
   font-family: var(--font-display, 'Cinzel', 'Georgia', serif);
-  font-size: 1.2rem;
+  font-size: clamp(1.45rem, 2vw, 1.95rem);
   font-weight: 700;
   letter-spacing: 0.05em;
   line-height: 1.1;
-  color: #f0ece4;
+  color: var(--gold);
   text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+  align-self: flex-end;
+  transition: transform 0.45s ease, opacity 0.45s ease;
+}
+
+.cardActive:hover .cardTitle,
+.cardActive:focus-within .cardTitle {
+  opacity: 0.88;
+  transform: translateY(-4px);
 }
 
 .cardDesc {
   font-size: 0.78rem;
-  color: rgba(240, 236, 228, 0.75);
-  margin-top: 6px;
+  color: #ffffff;
+  margin-top: 8px;
   line-height: 1.55;
+  text-align: justify;
   display: -webkit-box;
-line-clamp: 2;    
+  line-clamp: 3;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  margin-top: 0;
+  transform: translateY(12px);
+  transition: opacity 0.32s ease, max-height 0.32s ease, margin-top 0.32s ease, transform 0.32s ease;
+}
+
+.cardActive:hover .cardDesc {
+  opacity: 1;
+  max-height: 260px;
+  line-clamp: unset;
+  -webkit-line-clamp: unset;
+  margin-top: 8px;
+  transform: translateY(0);
+}
+
+.cardActive:focus-within .cardDesc {
+  opacity: 1;
+  max-height: 260px;
+  line-clamp: unset;
+  -webkit-line-clamp: unset;
+  margin-top: 8px;
+  transform: translateY(0);
 }
 
 /* ── Controls ──────────────────────────────────────────────── */
@@ -613,151 +954,6 @@ line-clamp: 2;
   border-color: transparent;
 }
 
-/* ── View All Button ───────────────────────────────────────── */
-.viewAllWrap {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  justify-content: center;
-  padding: 28px 24px 60px;
-}
-
-.viewAllBtn {
-  font-family: var(--font-body, 'Cormorant Garamond', Georgia, serif);
-  font-size: 13px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  padding: 13px 40px;
-  border-radius: 999px;
-  border: 1.5px solid rgba(201, 168, 76, 0.5);
-  background: transparent;
-  color: var(--gold);
-  cursor: pointer;
-  transition: background 0.22s ease, color 0.22s ease, border-color 0.22s ease;
-}
-
-.viewAllBtn:hover {
-  background: var(--gold);
-  color: var(--bg);
-  border-color: var(--gold);
-}
-
-/* ════════════════════════════════════════════════════════════
-   Modal Lightbox
-════════════════════════════════════════════════════════════ */
-.modalBackdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(30, 40, 100, 0.88); /* was rgba(20,26,70,0.92) — slightly lighter */
-  backdrop-filter: blur(8px);
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-.modalCard {
-  position: relative;
-  background: #ffffff;  /* changed to white */
-  border: 1px solid rgba(201, 168, 76, 0.25);
-  border-radius: 24px;
-  overflow: hidden;
-  width: 280px;
-  height: 420px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55), 0 0 60px rgba(201, 168, 76, 0.06) inset;
-  animation: slideUp 0.25s ease;
-}
-
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
-}
-
-.modalClose {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  z-index: 10;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  border: 1px solid rgba(201, 168, 76, 0.3);
-  background: rgba(46, 58, 138, 0.85); /* matched to new --surface */
-  backdrop-filter: blur(6px);
-  font-size: 14px;
-  color: var(--gold);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.15s ease, border-color 0.15s ease;
-}
-
-.modalClose:hover {
-  background: rgba(201, 168, 76, 0.15);
-  border-color: var(--gold);
-}
-
-.modalBody {
-  padding: 32px 28px 36px;
-}
-
-.modalBadge {
-  display: inline-block;
-  background: rgba(201, 168, 76, 0.12); /* was 0.10 */
-  border: 1px solid rgba(201, 168, 76, 0.28);
-  border-radius: 999px;
-  padding: 4px 14px;
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--gold);
-  font-family: var(--font-mono, 'Courier New', monospace);
-  margin-bottom: 16px;
-}
-
-.modalName {
-  font-family: var(--font-display, 'Cinzel', 'Georgia', serif);
-  font-size: 22px;
-  font-weight: 600;
-  color: #1a1a1a;  /* changed from #ffffff to dark for white bg */
-  margin: 0 0 14px;
-  line-height: 1.3;
-  letter-spacing: 0.04em;
-}
-
-.modalDetail {
-  font-size: 14px;
-  line-height: 1.8;
-  color: #333333;  /* changed from rgba(255, 255, 255, 0.75) to dark */
-  margin: 0 0 28px;
-}
-
-.badge {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background: rgba(46, 58, 138, 0.85); /* matched to new --surface */
-  backdrop-filter: blur(6px);
-  border-radius: 999px;
-  padding: 4px 12px;
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--gold);
-  font-family: var(--font-mono, 'Courier New', monospace);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-  z-index: 2;
-  border: 1px solid rgba(201, 168, 76, 0.2);
-}
-
 /* ── Image fallback ────────────────────────────────────────── */
 .imageFallback {
   width: 100%;
@@ -766,115 +962,6 @@ line-clamp: 2;
   display: grid;
   place-items: center;
   color: rgba(201, 168, 76, 0.35); /* slightly more visible */
-}
-
-/* ════════════════════════════════════════════════════════════
-   All Products Page
-════════════════════════════════════════════════════════════ */
-.allProductsPage {
-  position: relative;
-  z-index: 10;
-  width: 100%;
-  padding: 0 0 60px;
-}
-
-.allPageHeader {
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
-  padding: 0 10vw 32px;
-}
-
-.backBtn {
-  margin-top: 6px;
-  font-size: 13px;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 9px 20px;
-  border-radius: 999px;
-  border: 1.5px solid rgba(201, 168, 76, 0.35);
-  background: transparent;
-  color: var(--gold);
-  cursor: pointer;
-  white-space: nowrap;
-  flex-shrink: 0;
-  transition: background 0.2s ease, border-color 0.2s ease;
-  font-family: var(--font-body, 'Cormorant Garamond', Georgia, serif);
-}
-
-.backBtn:hover {
-  background: rgba(201, 168, 76, 0.12);
-  border-color: var(--gold);
-}
-
-.allPageTitleBlock {
-  display: flex;
-  flex-direction: column;
-}
-
-.allGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-  padding: 0 10vw;
-}
-
-.gridCard {
-  border-radius: 18px;
-  overflow: hidden;
-  background: var(--surface);
-  border: 1px solid rgba(201, 168, 76, 0.12); /* was 0.08 */
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);  /* was 0.3 */
-  cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
-}
-
-.gridCard:hover {
-  transform: translateY(-5px) scale(1.01);
-  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.4);
-  border-color: rgba(201, 168, 76, 0.30);
-}
-
-.gridImageWrap {
-  position: relative;
-  overflow: hidden;
-  height: 200px;
-}
-
-.image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-  transition: transform 0.4s ease;
-}
-
-.gridCard:hover .image {
-  transform: scale(1.05);
-}
-
-.tapHint {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  background: rgba(46, 58, 138, 0.85); /* matched */
-  backdrop-filter: blur(6px);
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--gold);
-  z-index: 2;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.2s ease;
-}
-
-.gridCard:hover .tapHint {
-  opacity: 1;
 }
 
 /* ── Responsive ────────────────────────────────────────────── */
@@ -892,20 +979,6 @@ line-clamp: 2;
   .stage {
     height: 340px;
     perspective: 1000px;
-  }
-
-  .allPageHeader {
-    flex-direction: column;
-    padding: 0 6vw 24px;
-  }
-
-  .allGrid {
-    padding: 0 6vw;
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  }
-
-  .modalCard {
-    max-width: 100%;
   }
 }
 
@@ -946,27 +1019,6 @@ line-clamp: 2;
   .pill {
     font-size: 10px;
     padding: 8px 16px;
-  }
-
-  .viewAllBtn {
-    font-size: 12px;
-    padding: 10px 30px;
-  }
-
-  .allPageHeader {
-    flex-direction: column;
-    padding: 0 16px 16px;
-  }
-
-  .allGrid {
-    padding: 0 16px;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 12px;
-  }
-
-  .modalCard {
-    width: 240px;
-    height: 360px;
   }
 }
 
@@ -1012,40 +1064,5 @@ line-clamp: 2;
   .pill {
     font-size: 9px;
     padding: 6px 12px;
-  }
-
-  .viewAllWrap {
-    padding: 16px 12px 40px;
-  }
-
-  .viewAllBtn {
-    font-size: 11px;
-    padding: 8px 24px;
-  }
-
-  .allPageHeader {
-    flex-direction: column;
-    padding: 0 12px 12px;
-    gap: 12px;
-  }
-
-  .backBtn {
-    font-size: 11px;
-    padding: 8px 16px;
-  }
-
-  .allGrid {
-    padding: 0 12px;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-    gap: 8px;
-  }
-
-  .modalCard {
-    width: 200px;
-    height: 300px;
-  }
-
-  .modalBackdrop {
-    padding: 12px;
   }
 }

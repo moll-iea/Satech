@@ -6,8 +6,7 @@ import MarqueeBar from "../components/MarqueeBar";
 import About from "../components/About";
 import Services from "../components/Services";
 import Products from "../components/Products";
-import Videos from "../components/Videos";  // Add this
-import Clients from "../components/Clients";
+// import Videos from "../components/Videos";  // Add this
 import Global from "../components/Global";
 import Contact from "../components/Contact";
 import Footer from "../components/Footer";
@@ -22,8 +21,7 @@ export default function HomePage() {
       <Products />
       <Services />
       <Global />
-       <Videos />
-      <Clients />
+       {/* <Videos /> */}
       <About />
       <Contact />
       <Footer />

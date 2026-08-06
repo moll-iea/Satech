@@ -60,58 +60,6 @@
   background: rgba(245, 197, 24, 0.7);
 }
 
-/* ── Category Tab Bar ── */
-.tabBar {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0;
-  margin-bottom: 48px;
-  border-bottom: 1px solid rgba(240, 237, 230, 0.1);
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.tabBar::-webkit-scrollbar { display: none; }
-
-.tabItem {
-  position: relative;
-  background: transparent;
-  border: none;
-  padding: 14px 28px;
-  font-family: var(--font-mono);
-  font-size: 12px;
-  letter-spacing: 0.04em;
-  color: rgba(240, 237, 230, 0.35);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: color 0.25s;
-}
-
-.tabItem::after {
-  content: '';
-  position: absolute;
-  bottom: -1px;
-  left: 0;
-  right: 0;
-  height: 2px;
-  background: var(--gold);
-  transform: scaleX(0);
-  transition: transform 0.3s ease;
-}
-
-.tabItem:hover {
-  color: rgba(240, 237, 230, 0.7);
-}
-
-.tabItemActive {
-  color: rgba(240, 237, 230, 1);
-  font-weight: 700;
-}
-
-.tabItemActive::after {
-  transform: scaleX(1);
-}
-
 /* ── Carousel wrapper ── */
 .carouselWrap {
   display: flex;
@@ -348,10 +296,6 @@
     max-width: 100%;
   }
 
-  .tabBar {
-    padding: 0 12px;
-    margin-bottom: 32px;
-  }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -380,18 +324,6 @@
   .introDesc {
     font-size: 12px;
     line-height: 1.6;
-  }
-
-  .tabBar {
-    padding: 0 8px;
-    margin-bottom: 24px;
-    gap: 0;
-  }
-
-  .tabItem {
-    padding: 10px 16px;
-    font-size: 11px;
-    letter-spacing: 0.02em;
   }
 
   .carouselWrap {
@@ -462,16 +394,6 @@
     line-height: 1.5;
   }
 
-  .tabBar {
-    padding: 0 6px;
-    margin-bottom: 16px;
-  }
-
-  .tabItem {
-    padding: 8px 12px;
-    font-size: 10px;
-  }
-
   .sideCol {
     width: 100%;
     padding-bottom: 16px;
@@ -529,12 +451,6 @@
     margin-bottom: 32px;
   }
   .introText { padding-top: 0; }
-
-  .tabBar {
-    justify-content: flex-start;
-    margin-bottom: 32px;
-  }
-  .tabItem { padding: 12px 18px; }
 
   .carouselWrap { flex-direction: column; gap: 24px; }
   .sideCol { width: 100%; flex-direction: row; align-items: center; padding-right: 0; gap: 20px; }

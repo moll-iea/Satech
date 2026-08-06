@@ -5,8 +5,8 @@
 export const NAV_LINKS = [
   { label: "Products",        href: "#products" },
   { label: "Services",        href: "#services" },
-  { label: "News & Articles",            href: "#news" },
-  { label: "Exhibitions",     href: "#exhibitions" },
+  { label: "News & Reels",            href: "#news" },
+  // { label: "Media",     href: "#videos" },
   { label: "About Us",        href: "#about" },
 ];
 

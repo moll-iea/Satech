@@ -8,7 +8,6 @@ export default function Services() {
   const trackRef = useRef(null);
   const [canPrev, setCanPrev] = useState(false);
   const [canNext, setCanNext] = useState(true);
-  const [activeCategory, setActiveCategory] = useState(null);
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -27,13 +26,7 @@ export default function Services() {
     fetchServices();
   }, []);
 
-  // Derive unique categories from fetched services data
-  const categories = ["All", ...Array.from(new Set(services.map((s) => s.category)))];
-
-  const filteredServices =
-    activeCategory && activeCategory !== "All"
-      ? services.filter((s) => s.category === activeCategory)
-      : services;
+  const filteredServices = services;
 
   const scroll = (dir) => {
     const el = trackRef.current;
@@ -57,31 +50,6 @@ export default function Services() {
   <div className={styles.label}>What We Offer</div>
   <h2 className={styles.heading}>Our Solutions</h2>
 </div>
-      {/* ── Category Tab Bar ── */}
-      <div className={styles.tabBar}>
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            className={`${styles.tabItem} ${
-              (activeCategory === cat || (!activeCategory && cat === "All"))
-                ? styles.tabItemActive
-                : ""
-            }`}
-            onClick={() => {
-              setActiveCategory(cat === "All" ? null : cat);
-              // Reset scroll on filter
-              if (trackRef.current) {
-                trackRef.current.scrollLeft = 0;
-                setCanPrev(false);
-                setCanNext(true);
-              }
-            }}
-          >
-            {cat}
-          </button>
-        ))}
-      </div>
-
       {/* ── Carousel ── */}
       <div className={styles.carouselWrap}>
 
