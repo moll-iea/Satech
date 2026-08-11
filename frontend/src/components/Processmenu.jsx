@@ -18,6 +18,18 @@ const POPOVER_GAP = 14;
 const VIEWPORT_MARGIN = 12;
 const MOBILE_BREAKPOINT = 900;
 
+function ScrollArrowIcon({ direction }) {
+  const isUp = direction === "up";
+
+  return (
+    <svg className={styles.processScrollBtnIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d={isUp ? "M6 14l6-6 6 6" : "M6 10l6 6 6-6"} />
+      <path d={isUp ? "M12 18V7" : "M12 6v11"} className={styles.processScrollBtnStem} />
+      <circle cx="12" cy={isUp ? 5.8 : 18.2} r="1" className={styles.processScrollBtnDot} />
+    </svg>
+  );
+}
+
 function computePopoverGeometry(anchorRect) {
   if (!anchorRect) return null;
 
@@ -252,7 +264,7 @@ export default function ProcessMenu() {
         aria-label="Scroll up"
         tabIndex={scrollState.canUp ? 0 : -1}
       >
-        ▲
+        <ScrollArrowIcon direction="up" />
       </button>
 
       <aside
@@ -302,7 +314,7 @@ export default function ProcessMenu() {
         aria-label="Scroll down"
         tabIndex={scrollState.canDown ? 0 : -1}
       >
-        ▼
+        <ScrollArrowIcon direction="down" />
       </button>
 
       {openTopic && (

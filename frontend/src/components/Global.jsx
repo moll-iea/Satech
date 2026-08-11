@@ -97,6 +97,18 @@ export default function Global() {
   );
   const videoItems = useMemo(() => videos, [videos]);
 
+  const NewsArrowIcon = ({ direction }) => {
+    const isUp = direction === "up";
+
+    return (
+      <svg className={styles.newsArrowIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d={isUp ? "M6 14l6-6 6 6" : "M6 10l6 6 6-6"} />
+        <path d={isUp ? "M12 18V7" : "M12 6v11"} className={styles.newsArrowStem} />
+        <circle cx="12" cy={isUp ? 5.8 : 18.2} r="1" className={styles.newsArrowDot} />
+      </svg>
+    );
+  };
+
   const ExhibitionPeakIcon = ({ className }) => (
     <svg className={className} viewBox="0 0 64 64" fill="none" aria-hidden="true">
       <path d="M12 48L28 20L38 34L46 26L52 48H12Z" stroke="currentColor" strokeWidth="2.5" strokeLinejoin="round" />
@@ -266,7 +278,7 @@ export default function Global() {
                   disabled={activeNewsIndex === 0}
                   aria-label="Previous news item"
                 >
-                  <span aria-hidden="true">▲</span>
+                  <NewsArrowIcon direction="up" />
                 </button>
                 <p className={styles.sidebarLabel}>Recommended For You</p>
               </div>
@@ -308,7 +320,7 @@ export default function Global() {
                   disabled={activeNewsIndex >= sidebarItems.length - 1}
                   aria-label="Next news item"
                 >
-                  <span aria-hidden="true">▼</span>
+                  <NewsArrowIcon direction="down" />
                 </button>
               </div>
             </aside>

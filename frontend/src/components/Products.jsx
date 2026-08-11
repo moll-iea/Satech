@@ -13,6 +13,18 @@ const resolveImageUrl = (imagePath) => {
 
 const TRANSITION = 900; // ms — must match CSS --trans
 
+function ArrowIcon({ direction }) {
+  const isLeft = direction === "left";
+
+  return (
+    <svg className={styles.arrowIcon} viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d={isLeft ? "M14 6l-6 6 6 6" : "M10 6l6 6-6 6"} />
+      <path d={isLeft ? "M19 12H8" : "M5 12h11"} className={styles.arrowIconStem} />
+      <circle cx={isLeft ? 20.2 : 3.8} cy="12" r="1" className={styles.arrowIconDot} />
+    </svg>
+  );
+}
+
 /* ── Fallback SVG ── */
 function ImageFallback() {
   return (
@@ -311,7 +323,9 @@ export default function Products() {
                 className={styles.arrowBtn}
                 onClick={() => { stopTimer(); advance(-1); startTimer(); }}
                 aria-label="Previous"
-              >‹</button>
+              >
+                <ArrowIcon direction="left" />
+              </button>
               <div className={styles.progressRing}>
                 {preview.map((_, i) => (
                   <span
@@ -325,7 +339,9 @@ export default function Products() {
                 className={styles.arrowBtn}
                 onClick={() => { stopTimer(); advance(1); startTimer(); }}
                 aria-label="Next"
-              >›</button>
+              >
+                <ArrowIcon direction="right" />
+              </button>
             </div>
           </div>
         </div>

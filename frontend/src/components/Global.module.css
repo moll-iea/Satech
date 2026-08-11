@@ -126,6 +126,26 @@
   flex-shrink: 0;
 }
 
+.newsArrowIcon {
+  width: 16px;
+  height: 16px;
+  overflow: visible;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  fill: none;
+}
+
+.newsArrowStem {
+  opacity: 0.95;
+}
+
+.newsArrowDot {
+  fill: currentColor;
+  stroke: none;
+}
+
 .newsArrow:hover:not(:disabled) {
   background: rgba(245, 197, 24, 0.12);
   transform: translateY(-1px);
