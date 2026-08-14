@@ -10,6 +10,7 @@
   --dark:  #244780;   /* deep navy */
   --dark2: #00004d;   /* darker navy for cards/panels */
   --gold:  #ffcc00;   /* gold */
+  --gold-rgb: 255, 204, 0;
   --silver: #c0c0c0;   /* silver */
   --light: #f0ede6;   /* off-white for text */
 

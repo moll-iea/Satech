@@ -273,7 +273,7 @@ export default function Products() {
       <div className={styles.heroHeader}>
         {/* <span className={styles.eyebrow}>Product Catalogue</span> */}
         <h2 className={styles.heroTitle}>
-          SELL THE PROBLEM YOU SOLVE, NOT<br />
+          <span>SELL THE PROBLEM YOU SOLVE, NOT</span>
           <em>THE PRODUCT YOU HAVE</em>
         </h2>
       </div>

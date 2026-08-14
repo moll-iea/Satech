@@ -4,14 +4,14 @@
   padding: 20px 60px;
   background: rgba(10,10,10,0.85);
   backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(245,197,24,0.1);
+  border-bottom: 1px solid rgba(var(--gold-rgb), 0.1);
   transition: padding 0.3s, background 0.3s;
 }
 
 .scrolled {
   padding: 14px 60px;
   background: rgba(10,10,10,0.97);
-  border-bottom-color: rgba(245,197,24,0.2);
+  border-bottom-color: rgba(var(--gold-rgb), 0.2);
 }
 
 .logo {

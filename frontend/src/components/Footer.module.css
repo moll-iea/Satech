@@ -1,6 +1,6 @@
 .footer {
   background: rgba(10,10,10,0.85);
-  border-top: 1px solid rgba(245,197,24,0.1);
+  border-top: 1px solid rgba(var(--gold-rgb), 0.1);
   padding: 20px 60px;
   display: flex;
   justify-content: space-between;

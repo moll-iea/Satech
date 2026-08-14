@@ -9,7 +9,7 @@ function parseStatNum(str) {
   return { target: parseInt(match[1], 10), suffix: match[2] };
 }
 
-function useCountUp(target, duration = 1500, start = false) {
+function useCountUp(target, duration = 6000, start = false) {
   const [value, setValue] = useState(0);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ function StatItem({ num, label, delay = 0 }) {
     return () => clearTimeout(t);
   }, [delay]);
 
-  const count = useCountUp(target, 1500, start);
+  const count = useCountUp(target, 6000, start);
 
   return (
     <div className={styles.statItem}>

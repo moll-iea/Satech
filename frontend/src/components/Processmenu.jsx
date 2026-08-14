@@ -257,12 +257,10 @@ export default function ProcessMenu() {
     <div ref={rootRef} className={styles.processRailWrap}>
       <button
         type="button"
-        className={`${styles.processScrollBtn} ${styles.processScrollBtnUp} ${
-          !scrollState.canUp ? styles.processScrollBtnHidden : ""
-        }`}
+        className={`${styles.processScrollBtn} ${styles.processScrollBtnUp}`}
         onClick={() => scrollByStep(-1)}
         aria-label="Scroll up"
-        tabIndex={scrollState.canUp ? 0 : -1}
+        tabIndex={0}
       >
         <ScrollArrowIcon direction="up" />
       </button>

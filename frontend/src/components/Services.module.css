@@ -15,17 +15,18 @@
   font-size: 11px;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: rgba(245, 197, 24, 0.8);
+  color: rgba(var(--gold-rgb), 0.8);
   margin-bottom: 20px;
 }
 
 .heading {
   font-family: var(--font-display);
-  font-size: clamp(36px, 5vw, 56px);
+  font-size: clamp(32px, 4vw, 60px);
   font-weight: 700;
   color: rgba(240, 237, 230, 1);
-  line-height: 1.05;
-  letter-spacing: -0.5px;
+  line-height: 1.08;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
   margin: 0 0 20px 0;
 }
 
@@ -57,7 +58,7 @@
   left: 0;
   width: 48px;
   height: 1px;
-  background: rgba(245, 197, 24, 0.7);
+  background: rgba(var(--gold-rgb), 0.7);
 }
 
 /* ── Carousel wrapper ── */
@@ -99,14 +100,14 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1px solid rgba(240, 237, 230, 0.2);
-  background: transparent;
+  border: 1px solid var(--gold);
+  background: rgba(var(--gold-rgb), 0.06);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: rgba(240, 237, 230, 0.6);
+  color: var(--gold);
   cursor: pointer;
-  transition: border-color 0.3s, color 0.3s, background 0.3s;
+  transition: border-color 0.3s, color 0.3s, background 0.3s, box-shadow 0.3s, transform 0.2s;
 }
 .navBtn svg {
   width: 15px;
@@ -115,7 +116,9 @@
 .navBtn:hover {
   border-color: var(--gold);
   color: var(--gold);
-  background: rgba(245, 197, 24, 0.08);
+  background: rgba(var(--gold-rgb), 0.18);
+  box-shadow: 0 6px 20px rgba(var(--gold-rgb), 0.18);
+  transform: translateY(-2px);
 }
 .navBtnDisabled {
   opacity: 0.25;
@@ -212,7 +215,7 @@
   letter-spacing: -2px;
 }
 .card:hover .num {
-  color: rgba(245, 197, 24, 0.12);
+  color: rgba(var(--gold-rgb), 0.12);
 }
 
 /* ── Bottom text block ── */

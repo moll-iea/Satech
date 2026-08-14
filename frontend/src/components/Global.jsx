@@ -97,6 +97,12 @@ export default function Global() {
   );
   const videoItems = useMemo(() => videos, [videos]);
 
+  // Pagination for reels (6 per page)
+  const [videoPage, setVideoPage] = useState(0);
+  const VIDEOS_PER_PAGE = 6;
+  const totalVideoPages = Math.max(1, Math.ceil(videoItems.length / VIDEOS_PER_PAGE));
+  const pagedVideoItems = videoItems.slice(videoPage * VIDEOS_PER_PAGE, videoPage * VIDEOS_PER_PAGE + VIDEOS_PER_PAGE);
+
   const NewsArrowIcon = ({ direction }) => {
     const isUp = direction === "up";
 
@@ -183,6 +189,20 @@ export default function Global() {
     const fallbackIcons = [ExhibitionPeakIcon, ExhibitionGearIcon, ExhibitionCircuitIcon, ExhibitionSparkIcon, ExhibitionGlobalIcon, ExhibitionHexIcon];
     return fallbackIcons[index % fallbackIcons.length];
   };
+
+  function ArrowIcon({ direction = "down" }) {
+    const rotation = direction === "up" ? -90 : direction === "down" ? 90 : 0;
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <g transform={`rotate(${rotation} 12 12)`}>
+          <path
+            d="M7 11h7.586L11.293 6.707 12.707 5.293 19.414 12l-6.707 6.707-1.414-1.414L14.586 13H7z"
+            fill="currentColor"
+          />
+        </g>
+      </svg>
+    );
+  }
 
   useEffect(() => {
     if (sidebarItems.length === 0) {
@@ -374,33 +394,61 @@ export default function Global() {
                 {videosLoading ? (
                   <div className={styles.videosLoading}>Loading videos...</div>
                 ) : videoItems.length > 0 ? (
-                  <div className={styles.videoRow}>
-                    {videoItems.map((video) => (
-                      <a
-                        key={video._id}
-                        href={video.url}
-                        className={styles.videoCard}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                  <>
+                    <div className={styles.videoRow}>
+                      {pagedVideoItems.map((video) => (
+                        <a
+                          key={video._id}
+                          href={video.url}
+                          className={styles.videoCard}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <div className={styles.videoImageRect}>
+                            {video.thumbnail ? (
+                              <img
+                                src={video.thumbnail}
+                                alt={video.title}
+                                className={styles.cardImage}
+                                loading="lazy"
+                              />
+                            ) : (
+                              <div className={styles.cardImageFallback}>
+                                <span className={styles.fallbackIcon}>▶</span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className={styles.cardBody}>
+                            <h3 className={styles.cardTitle}>{video.title}</h3>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+
+                    <div className={styles.pageNavWrap}
+                         style={{ marginTop: 12, display: 'flex', justifyContent: 'center', gap: 12 }}>
+                      <button
+                        className={styles.pageBtn}
+                        onClick={() => setVideoPage((p) => Math.max(0, p - 1))}
+                        disabled={videoPage <= 0}
+                        aria-label="Previous reels page"
                       >
-                        <div className={styles.videoThumb}>
-                          {video.thumbnail ? (
-                            <img src={video.thumbnail} alt={video.title} loading="lazy" />
-                          ) : (
-                            <div className={styles.videoThumbFallback}>
-                              <span className={styles.videoPlay}>▶</span>
-                            </div>
-                          )}
-                        </div>
-                        <div className={styles.videoMeta}>
-                          <h3 className={styles.videoTitle}>{video.title}</h3>
-                          {video.description ? (
-                            <p className={styles.videoDescription}>{video.description}</p>
-                          ) : null}
-                        </div>
-                      </a>
-                    ))}
-                  </div>
+                        <ArrowIcon direction="up" />
+                      </button>
+
+                      <div className={styles.pageIndicator}>{`${videoPage + 1}/${totalVideoPages}`}</div>
+
+                      <button
+                        className={styles.pageBtn}
+                        onClick={() => setVideoPage((p) => Math.min(totalVideoPages - 1, p + 1))}
+                        disabled={videoPage >= totalVideoPages - 1}
+                        aria-label="Next reels page"
+                      >
+                        <ArrowIcon direction="down" />
+                      </button>
+                    </div>
+                  </>
                 ) : (
                   <div className={styles.videosLoading}>No videos yet.</div>
                 )}

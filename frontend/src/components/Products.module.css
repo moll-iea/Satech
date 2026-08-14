@@ -13,8 +13,8 @@
   --card-w: 220px;
   --card-h: 320px;
   --trans: 900ms;
-  --gold: #ffc629;
-  --gold-dim: rgba(255, 198, 41, 0.18);
+  --gold: #ffcc00;
+  --gold-dim: rgba(255, 204, 0, 0.18);
   --bg: #3d4fa0;          /* was #283176 — noticeably lighter */
   --surface: #2e3a8a;     /* was #1e2560 — lighter card surfaces */
   --text: #ffffff;
@@ -50,7 +50,7 @@
 .orb1 {
   width: 700px;
   height: 700px;
-  background: radial-gradient(circle, rgba(255,198,41,0.18), transparent 65%); /* was 0.13 */
+  background: radial-gradient(circle, rgba(255, 204, 0, 0.18), transparent 65%); /* was 0.13 */
   top: -200px;
   left: -200px;
   animation-delay: 0s;
@@ -98,8 +98,8 @@
   pointer-events: none;
   z-index: 0;
   background-image:
-    linear-gradient(rgba(255, 198, 41, 0.06) 1px, transparent 1px), /* was 0.04 */
-    linear-gradient(90deg, rgba(255, 198, 41, 0.06) 1px, transparent 1px);
+    linear-gradient(rgba(255, 204, 0, 0.06) 1px, transparent 1px), /* was 0.04 */
+    linear-gradient(90deg, rgba(255, 204, 0, 0.06) 1px, transparent 1px);
   background-size: 60px 60px;
   mask-image: radial-gradient(ellipse 80% 60% at 50% 50%, black 30%, transparent 100%);
   animation: gridShift 20s linear infinite;
@@ -119,7 +119,7 @@
   z-index: 1;
   background: radial-gradient(
     700px circle at var(--mx) var(--my),
-    rgba(201, 168, 76, 0.12) 0%,   /* was 0.09 */
+    rgba(var(--gold-rgb), 0.12) 0%,   /* was 0.09 */
     rgba(100, 140, 220, 0.07) 40%, /* was 0.05 */
     transparent 70%
   );
@@ -138,11 +138,11 @@
   display: none;
 }
 
-.p1 { width: 6px;  height: 6px;  background: rgba(201,168,76,0.5);   left: 12%;  animation-delay: 0s;   animation-duration: 11s; }
+.p1 { width: 6px;  height: 6px;  background: rgba(var(--gold-rgb), 0.5);   left: 12%;  animation-delay: 0s;   animation-duration: 11s; }
 .p2 { width: 4px;  height: 4px;  background: rgba(120,160,230,0.4);  left: 28%;  animation-delay: 2.5s; animation-duration: 14s; }
-.p3 { width: 8px;  height: 8px;  background: rgba(201,168,76,0.3);   left: 50%;  animation-delay: 5s;   animation-duration: 10s; }
+.p3 { width: 8px;  height: 8px;  background: rgba(var(--gold-rgb), 0.3);   left: 50%;  animation-delay: 5s;   animation-duration: 10s; }
 .p4 { width: 5px;  height: 5px;  background: rgba(100,140,220,0.45); left: 68%;  animation-delay: 1s;   animation-duration: 13s; }
-.p5 { width: 3px;  height: 3px;  background: rgba(201,168,76,0.55);  left: 80%;  animation-delay: 3.5s; animation-duration: 9s;  }
+.p5 { width: 3px;  height: 3px;  background: rgba(var(--gold-rgb), 0.55);  left: 80%;  animation-delay: 3.5s; animation-duration: 9s;  }
 .p6 { width: 7px;  height: 7px;  background: rgba(150,180,240,0.35); left: 90%;  animation-delay: 7s;   animation-duration: 15s; }
 
 @keyframes floatUp {
@@ -157,7 +157,7 @@
   position: relative;
   z-index: 10;
   text-align: center;
-  max-width: 680px;
+  max-width: 760px;
   margin: 0 auto 32px;
   padding: 0 24px;
   letter-spacing: 0.18em;
@@ -175,18 +175,28 @@
 
 .heroTitle {
   font-family: var(--font-display, 'Cinzel', 'Georgia', serif);
-  font-size: clamp(28px, 4vw, 46px);
+  font-size: clamp(32px, 4vw, 60px);
   font-weight: 700;
-  line-height: 1.15;
+  line-height: 0.9;
   color: #ffffff;
-  margin: 0;
-  letter-spacing: -0.5px;
+  margin: 0 auto;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  max-width: 1400px;
+  display: block;
+}
+
+.heroTitle span,
+.heroTitle em {
+  display: block;
 }
 
 .heroTitle em {
-  font-style: normal;
+  font-style: italic;
   color: var(--gold);
-  font-family: var(--font-body, 'Cormorant Garamond', Georgia, serif);
+  font-family: var(--font-display, 'Cinzel', 'Georgia', serif);
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
 /* ── Search — icon on right, expands LEFT ──────────────────── */
@@ -205,10 +215,10 @@
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  border: 1.5px solid rgba(255, 198, 41, 0.32);
+  border: 1.5px solid rgba(var(--gold-rgb), 0.32);
   background: rgba(255, 255, 255, 0.06);
   backdrop-filter: blur(8px);
-  color: rgba(255, 198, 41, 0.72);
+  color: rgba(var(--gold-rgb), 0.72);
   cursor: pointer;
   flex-shrink: 0;
   z-index: 2;
@@ -218,7 +228,7 @@
 .searchIconBtn:hover {
   border-color: var(--gold);
   color: var(--gold);
-  background: rgba(255, 198, 41, 0.08);
+  background: rgba(var(--gold-rgb), 0.08);
 }
 
 .searchExpandable {
@@ -233,7 +243,7 @@
   padding-right: 24px;
   height: 36px;
   background: rgba(46, 58, 138, 0.9);  /* was rgba(28, 35, 88, 0.9) — matches new --surface */
-  border: 1.5px solid rgba(255, 198, 41, 0.28);
+  border: 1.5px solid rgba(var(--gold-rgb), 0.28);
   border-right: none;
   border-radius: 999px 0 0 999px;
   backdrop-filter: blur(16px);
@@ -245,7 +255,7 @@
 .searchWrapperOpen .searchIconBtn {
   border-radius: 0 50% 50% 0;
   border-left: none;
-  border-color: rgba(255, 198, 41, 0.55);
+  border-color: rgba(var(--gold-rgb), 0.55);
   background: rgba(46, 58, 138, 0.9); /* matched */
   color: var(--gold);
 }
@@ -255,9 +265,9 @@
   opacity: 1;
   pointer-events: all;
   padding-left: 14px;
-  border-color: rgba(255, 198, 41, 0.55);
+  border-color: rgba(var(--gold-rgb), 0.55);
   box-shadow:
-    0 0 0 3px rgba(255, 198, 41, 0.07),
+    0 0 0 3px rgba(var(--gold-rgb), 0.07),
     0 4px 20px rgba(0, 0, 0, 0.35),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
 }
@@ -292,9 +302,9 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 1px solid rgba(201, 168, 76, 0.3);
-  background: rgba(201, 168, 76, 0.08);
-  color: rgba(201, 168, 76, 0.65);
+  border: 1px solid rgba(var(--gold-rgb), 0.3);
+  background: rgba(var(--gold-rgb), 0.08);
+  color: rgba(var(--gold-rgb), 0.65);
   font-size: 9px;
   cursor: pointer;
   line-height: 1;
@@ -302,7 +312,7 @@
 }
 
 .searchClear:hover {
-  background: rgba(201, 168, 76, 0.18);
+  background: rgba(var(--gold-rgb), 0.18);
   color: var(--gold);
   border-color: var(--gold);
 }
@@ -337,7 +347,7 @@
   text-transform: uppercase;
   padding: 9px 24px;
   border-radius: 999px;
-  border: 1.5px solid rgba(255, 198, 41, 0.35); /* slightly more visible */
+  border: 1.5px solid rgba(var(--gold-rgb), 0.35); /* slightly more visible */
   background: rgba(255, 255, 255, 0.08);        /* was 0.05 */
   color: rgba(232, 226, 212, 0.9);              /* was 0.8 */
   cursor: pointer;
@@ -350,8 +360,8 @@
 .pill:hover {
   border-color: var(--gold);
   color: var(--gold);
-  background: rgba(255, 198, 41, 0.10);
-  box-shadow: 0 4px 20px rgba(201, 168, 76, 0.18), inset 0 1px 0 rgba(255,255,255,0.10);
+  background: rgba(var(--gold-rgb), 0.10);
+  box-shadow: 0 4px 20px rgba(var(--gold-rgb), 0.18), inset 0 1px 0 rgba(255,255,255,0.10);
   transform: translateY(-1px);
 }
 
@@ -359,7 +369,7 @@
   background: var(--gold) !important;
   border-color: var(--gold) !important;
   color: #07080d !important;
-  box-shadow: 0 4px 20px rgba(201, 168, 76, 0.4), 0 0 0 3px rgba(201, 168, 76, 0.15) !important;
+  box-shadow: 0 4px 20px rgba(var(--gold-rgb), 0.4), 0 0 0 3px rgba(var(--gold-rgb), 0.15) !important;
   transform: translateY(-1px);
 }
 
@@ -448,10 +458,10 @@
   width: 30px;
   height: 30px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 198, 41, 0.3);
-  background: rgba(20, 24, 60, 0.75);
+  border: 1px solid rgba(var(--gold-rgb), 0.3);
+  background: transparent;
   backdrop-filter: blur(8px);
-  color: rgba(255, 198, 41, 0.8);
+  color: rgba(var(--gold-rgb), 0.8);
   font-size: 10px;
   display: flex;
   align-items: center;
@@ -483,7 +493,13 @@
 }
 
 .processScrollBtn:hover {
-  background: rgba(255, 198, 41, 0.16);
+  background: rgba(20, 24, 60, 0.82);
+  border-color: rgba(var(--gold-rgb), 0.45);
+  color: var(--gold);
+}
+
+.processScrollBtn:focus-visible {
+  background: rgba(20, 24, 60, 0.82);
   border-color: var(--gold);
   color: var(--gold);
 }
@@ -512,7 +528,7 @@
 
 .processItem:hover,
 .processItemActive {
-  background: rgba(255, 198, 41, 0.08);
+  background: rgba(var(--gold-rgb), 0.08);
 }
 
 .processIconBtn {
@@ -523,8 +539,8 @@
   display: grid;
   place-items: center;
   background: transparent;
-  border: 1px solid rgba(255, 198, 41, 0.25);
-  color: rgba(255, 198, 41, 0.75);
+  border: 1px solid rgba(var(--gold-rgb), 0.25);
+  color: rgba(var(--gold-rgb), 0.75);
   cursor: pointer;
   padding: 0;
   transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
@@ -532,7 +548,7 @@
 
 .processItem:hover .processIconBtn,
 .processIconBtn:focus-visible {
-  background: rgba(255, 198, 41, 0.12);
+  background: rgba(var(--gold-rgb), 0.12);
   border-color: var(--gold);
   color: var(--gold);
   transform: scale(1.06);
@@ -540,7 +556,7 @@
 }
 
 .processItemOpen .processIconBtn {
-  background: rgba(255, 198, 41, 0.2);
+  background: rgba(var(--gold-rgb), 0.2);
   border-color: var(--gold);
   color: var(--gold);
 }
@@ -575,7 +591,7 @@
 .processPopover {
   padding: 16px 18px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 198, 41, 0.28);
+  border: 1px solid rgba(var(--gold-rgb), 0.28);
   background: rgba(20, 24, 60, 0.92);
   backdrop-filter: blur(14px);
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
@@ -587,8 +603,8 @@
   width: 12px;
   height: 12px;
   background: rgba(20, 24, 60, 0.92);
-  border-left: 1px solid rgba(255, 198, 41, 0.28);
-  border-bottom: 1px solid rgba(255, 198, 41, 0.28);
+  border-left: 1px solid rgba(var(--gold-rgb), 0.28);
+  border-bottom: 1px solid rgba(var(--gold-rgb), 0.28);
 }
 
 .processPopoverClose {
@@ -624,7 +640,7 @@
   object-fit: cover;
   border-radius: 8px;
   margin-bottom: 8px;
-  border: 1px solid rgba(255, 198, 41, 0.2);
+  border: 1px solid rgba(var(--gold-rgb), 0.2);
 }
 
 .processPopoverDesc {
@@ -767,9 +783,9 @@
   cursor: default;
   box-shadow:
     0 30px 80px rgba(0, 0, 0, 0.45),
-    0 0 0 1.5px rgba(201, 168, 76, 0.55),
-    0 0 60px rgba(201, 168, 76, 0.20),
-    0 0 120px rgba(201, 168, 76, 0.10);
+    0 0 0 1.5px rgba(var(--gold-rgb), 0.55),
+    0 0 60px rgba(var(--gold-rgb), 0.20),
+    0 0 120px rgba(var(--gold-rgb), 0.10);
 }
 
 .cardActive::after {
@@ -777,10 +793,10 @@
   position: absolute;
   inset: 0;
   border-radius: 18px;
-  border: 1.5px solid rgba(201, 168, 76, 0.6);
+  border: 1.5px solid rgba(var(--gold-rgb), 0.6);
   box-shadow:
-    0 0 40px rgba(201, 168, 76, 0.18) inset,
-    0 0 0 6px rgba(201, 168, 76, 0.06) inset;
+    0 0 40px rgba(var(--gold-rgb), 0.18) inset,
+    0 0 0 6px rgba(var(--gold-rgb), 0.06) inset;
   pointer-events: none;
   z-index: 3;
 }
@@ -813,15 +829,15 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  align-items: flex-end;
-  padding: 18px 18px;
+  align-items: flex-start;
+  padding: 18px;
   opacity: 0;
   transform: translateY(10px);
   transition:
     opacity 0.45s ease,
     transform 0.45s ease;
   z-index: 2;
-  text-align: right;
+  text-align: left;
 }
 
 .cardActive:hover .cardCaption,
@@ -866,7 +882,7 @@
   line-height: 1.1;
   color: var(--gold);
   text-shadow: 0 1px 4px rgba(0,0,0,0.6);
-  align-self: flex-end;
+  align-self: flex-start;
   transition: transform 0.45s ease, opacity 0.45s ease;
 }
 
@@ -928,8 +944,8 @@
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  border: 1.5px solid rgba(201, 168, 76, 0.4);
-  background: rgba(201, 168, 76, 0.08); /* was 0.06 */
+  border: 1.5px solid rgba(var(--gold-rgb), 0.4);
+  background: rgba(var(--gold-rgb), 0.08); /* was 0.06 */
   backdrop-filter: blur(12px);
   font-size: 22px;
   color: var(--gold);
@@ -963,9 +979,9 @@
 }
 
 .arrowBtn:hover {
-  background: rgba(201, 168, 76, 0.20);
+  background: rgba(var(--gold-rgb), 0.20);
   border-color: var(--gold);
-  box-shadow: 0 6px 28px rgba(201, 168, 76, 0.28), inset 0 1px 0 rgba(255,255,255,0.12);
+  box-shadow: 0 6px 28px rgba(var(--gold-rgb), 0.28), inset 0 1px 0 rgba(255,255,255,0.12);
   transform: scale(1.08);
 }
 
@@ -983,14 +999,14 @@
   background: rgba(242, 237, 230, 0.38); /* was 0.28 */
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   cursor: pointer;
-  border: 1px solid rgba(201, 168, 76, 0.2);
+  border: 1px solid rgba(var(--gold-rgb), 0.2);
 }
 
 .pipActive {
   background: var(--gold);
   width: 24px;
   border-radius: 3px;
-  box-shadow: 0 0 8px rgba(201, 168, 76, 0.5);
+  box-shadow: 0 0 8px rgba(var(--gold-rgb), 0.5);
   border-color: transparent;
 }
 
@@ -1001,7 +1017,7 @@
   background: var(--surface);
   display: grid;
   place-items: center;
-  color: rgba(201, 168, 76, 0.35); /* slightly more visible */
+  color: rgba(var(--gold-rgb), 0.35); /* slightly more visible */
 }
 
 /* ── Responsive ────────────────────────────────────────────── */
