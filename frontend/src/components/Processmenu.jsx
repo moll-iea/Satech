@@ -80,7 +80,6 @@ function computePopoverGeometry(anchorRect) {
    it never gets clipped by overflow:auto on .processMenu. */
 function ProcessPopover({ topic, anchorEl, onClose, onMouseEnter, onMouseLeave }) {
   const [geometry, setGeometry] = useState(() => computePopoverGeometry(anchorEl?.getBoundingClientRect()));
-  const [imgBroken, setImgBroken] = useState(false);
   const popoverRef = useRef(null);
 
   const reposition = useCallback(() => {
@@ -123,15 +122,6 @@ function ProcessPopover({ topic, anchorEl, onClose, onMouseEnter, onMouseLeave }
         ×
       </button>
       <div className={styles.processPopoverTitle}>{topic.title}</div>
-      {topic.image && !imgBroken && (
-        <img
-          className={styles.processPopoverImage}
-          src={topic.image}
-          alt={topic.title}
-          loading="lazy"
-          onError={() => setImgBroken(true)}
-        />
-      )}
       <div className={styles.processPopoverDesc}>{topic.desc}</div>
     </div>,
     document.body
@@ -297,7 +287,18 @@ export default function ProcessMenu() {
                 <ProcessIcon name={topic.icon} />
               </button>
 
-              <span className={styles.processTitleInline}>{topic.title}</span>
+              {topic.url ? (
+                <a
+                  className={styles.processTitleInline}
+                  href={topic.url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {topic.title}
+                </a>
+              ) : (
+                <span className={styles.processTitleInline}>{topic.title}</span>
+              )}
             </div>
           );
         })}

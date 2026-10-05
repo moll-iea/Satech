@@ -1,5 +1,3 @@
-const PROCESS_IMAGE_BASE = "/assets/process";
-
 const RAW_PROCESS_TOPICS = [
   {
     id: "tester-parts",
@@ -190,9 +188,46 @@ const RAW_PROCESS_TOPICS = [
     desc:
       "For counting and verifying component quantities within sealed packaging, X-ray counter inspection uses X-ray imaging to confirm exact unit counts without opening the package.",
   },
+  {
+    id: "advanced-packaging-market-trends",
+    icon: "xray3d",
+    title: "Advanced Packaging: Market Trends and Outlook",
+    url: "https://insights.trendforce.com/p/advanced-packaging-market-trends",
+    desc:
+      "AI-driven demand is accelerating advanced packaging, with CoWoS and other high-density packaging technologies expanding to support growing chiplet integration and high-bandwidth computing.",
+  },
+  {
+    id: "panel-level-packaging",
+    icon: "wafer",
+    title: "The Rise of Panel-Level Packaging",
+    url: "https://semiengineering.com/the-rise-of-panel-level-packaging/",
+    desc:
+      "AI and HPC are accelerating panel-level packaging, enabling larger packages, higher material efficiency, and lower costs - while advances in alignment, die placement, warpage control, and organic or glass-core interposers remain critical for high-volume production.",
+  },
+  {
+    id: "xray-vs-aoi-hidden-defects",
+    icon: "xray",
+    title: "X-Ray vs. AOI: Hidden Defect Detection",
+    url: "https://www.smtfactory.com/amp/X-ray-vs-AOI-Which-Defects-Are-Invisible-To-Optical-Inspection-id49040375.html",
+    desc:
+      "X-ray inspection goes beyond surface-level inspection, uncovering hidden solder defects and internal issues that AOI can miss - helping manufacturers improve quality, reliability, and production confidence.",
+  },
+  {
+    id: "2d-vs-3d-aoi",
+    icon: "aoi",
+    title: "2D vs. 3D AOI: Choosing the Right Inspection Method",
+    url: "https://www.smtfactory.com/2d-vs-3d-aoi-explained-which-inspection-method-suits-your",
+    desc:
+      "2D AOI delivers fast, cost-effective inspection for standard PCBs, while 3D AOI provides deeper defect detection and precise height and volume measurements - making it ideal for complex, high-reliability applications.",
+  },
+  {
+    id: "swir-semiconductor-inspection",
+    icon: "xray3d",
+    title: "Using SWIR Imaging in Semiconductor Inspection",
+    url: "https://www.azom.com/article.aspx?ArticleID=25457",
+    desc:
+      "SWIR imaging enables non-destructive inspection beneath silicon and inside semiconductor packages, revealing hidden defects such as cracks, voids, misalignment, and contamination - improving failure analysis and inspection of advanced devices.",
+  },
 ];
 
-export const PROCESS_TOPICS = RAW_PROCESS_TOPICS.map((topic) => ({
-  ...topic,
-  image: topic.image || `${PROCESS_IMAGE_BASE}/${topic.id}.jpg`,
-}));
+export const PROCESS_TOPICS = [...RAW_PROCESS_TOPICS].reverse();

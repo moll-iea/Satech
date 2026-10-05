@@ -4,6 +4,7 @@ import { exhibitionService } from "../services/exhibitionService";
 import { videoService } from "../services/videoService";
 import { useScrollReveal } from "../hooks/useScrollReveal";
 import styles from "./Global.module.css";
+import { VideosModal } from "./Videos";
 
 export default function Global() {
   const ref = useScrollReveal();
@@ -21,6 +22,7 @@ export default function Global() {
 
   const [videos, setVideos] = useState([]);
   const [videosLoading, setVideosLoading] = useState(true);
+  const [modalVideo, setModalVideo] = useState(null);
 
   const loading = newsLoading || exhibitionsLoading || videosLoading;
 
@@ -397,12 +399,11 @@ export default function Global() {
                   <>
                     <div className={styles.videoRow}>
                       {pagedVideoItems.map((video) => (
-                        <a
+                        <button
                           key={video._id}
-                          href={video.url}
                           className={styles.videoCard}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                          type="button"
+                          onClick={() => setModalVideo(video)}
                         >
                           <div className={styles.videoImageRect}>
                             {video.thumbnail ? (
@@ -422,7 +423,7 @@ export default function Global() {
                           <div className={styles.cardBody}>
                             <h3 className={styles.cardTitle}>{video.title}</h3>
                           </div>
-                        </a>
+                        </button>
                       ))}
                     </div>
 
@@ -522,6 +523,13 @@ export default function Global() {
                 </div>
               </div>
             </div>
+          )}
+
+          {modalVideo && (
+            <VideosModal
+              video={modalVideo}
+              onClose={() => setModalVideo(null)}
+            />
           )}
 
 

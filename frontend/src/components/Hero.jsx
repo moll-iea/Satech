@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { HERO_STATS } from "../data/siteData";
 import PCBBackground from "./PCBBackground";
 import styles from "./Hero.module.css";
@@ -56,6 +56,44 @@ function StatItem({ num, label, delay = 0 }) {
 }
 
 export default function Hero() {
+  const wrapRef = useRef(null);   // wrapper ng TECH + subtitle
+  const tRef = useRef(null);      // "T" ng TECH
+  const innerRef = useRef(null);  // subtitle text
+
+  // Kung kulang/sobra pa rin ang pantay, ito lang ang i-adjust:
+  const STEM_LEFT_RATIO = 0.32; // kaliwang gilid ng stem ng T, % ng lapad ng T
+  const NUDGE_PX = 0;           // +kanan / -kaliwa, fine-tune
+
+  // Itapat ang kaliwang gilid ng "T" ng THE sa kaliwang gilid ng stem ng "T" sa TECH,
+  // at i-scale pababa lang kung lalagpas sa dulo ng "H".
+  useLayoutEffect(() => {
+    const fit = () => {
+      const wrap = wrapRef.current;
+      const t = tRef.current;
+      const inner = innerRef.current;
+      if (!wrap || !t || !inner) return;
+
+      inner.style.transform = "none";
+      inner.style.marginLeft = "0px";
+
+      const wrapW = wrap.offsetWidth;
+      const titleLS = parseFloat(getComputedStyle(t).letterSpacing) || 0;
+      const tWidth = t.offsetWidth - titleLS;     // lapad ng glyph ng T
+      const natural = inner.offsetWidth;          // buong lapad ng subtitle
+
+      const offset = tWidth * STEM_LEFT_RATIO + NUDGE_PX;
+      const s = Math.min(1, (wrapW - offset) / natural);
+
+      inner.style.marginLeft = `${offset}px`;
+      inner.style.transform = `scale(${s})`;
+    };
+
+    fit();
+    window.addEventListener("resize", fit);
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+    return () => window.removeEventListener("resize", fit);
+  }, []);
+
   return (
     <section className={styles.hero} id="hero">
       {/* Animated PCB canvas — replaces static .bg and .grid divs */}
@@ -67,9 +105,17 @@ export default function Hero() {
 
       <h1 className={styles.title}>
         <span className={styles.fill}>SA</span>
-        <span className={styles.stroke}>TECH</span>
+        <span className={styles.techWrap} ref={wrapRef}>
+          <span className={styles.stroke}>
+            <span ref={tRef}>T</span>ECH
+          </span>
+          <span className={styles.sub}>
+            <span className={styles.subInner} ref={innerRef}>
+              The Solutions Provider!
+            </span>
+          </span>
+        </span>
       </h1>
-      <p className={styles.sub}>The Solutions Provider!</p>
 
       <p className={styles.tagline}>
         <span className={styles.colorA}>INTELLIGENT</span>{" "}

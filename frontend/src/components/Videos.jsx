@@ -21,7 +21,7 @@ function ArrowIcon({ direction = "down" }) {
   );
 }
 
-function VideosModal({ video, onClose }) {
+export function VideosModal({ video, onClose }) {
   useEffect(() => {
     const handler = (e) => {
       if (e.key === "Escape") onClose();
@@ -35,18 +35,26 @@ function VideosModal({ video, onClose }) {
   }, [onClose]);
 
   const isYouTubeUrl = (url) => url?.includes("youtube.com") || url?.includes("youtu.be");
-  const getYouTubeEmbedUrl = (url) => {
+  const getYouTubeVideoId = (url) => {
     if (!url) return "";
-    const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/)?.[1];
-    return videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : null;
+    return url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([^&\n?#]+)/)?.[1] || "";
+  };
+
+  const getYouTubeEmbedUrl = (url) => {
+    const videoId = getYouTubeVideoId(url);
+    return videoId
+      ? `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}`
+      : null;
   };
 
   return (
     <div className={styles.modalBackdrop} onClick={onClose}>
       <div className={styles.modalCard} onClick={(e) => e.stopPropagation()}>
-        <button className={styles.modalClose} onClick={onClose} aria-label="Close">
-          ✕
-        </button>
+        <div className={styles.modalHeader}>
+          <button className={styles.modalClose} onClick={onClose} aria-label="Close video">
+            ✕
+          </button>
+        </div>
         <div className={styles.modalVideoWrap}>
           {isYouTubeUrl(video.url) ? (
             <iframe
@@ -65,6 +73,16 @@ function VideosModal({ video, onClose }) {
         <div className={styles.modalBody}>
           <h3 className={styles.modalTitle}>{video.title}</h3>
           <p className={styles.modalDescription}>{video.description}</p>
+          {isYouTubeUrl(video.url) && (
+            <a
+              href={video.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.openInYouTube}
+            >
+              Open in YouTube
+            </a>
+          )}
         </div>
       </div>
     </div>

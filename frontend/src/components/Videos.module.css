@@ -276,6 +276,25 @@
   overflow: auto;
   position: relative;
   animation: slideUp 0.3s ease;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--gold-rgb), 0.7) transparent;
+}
+
+.modalCard::-webkit-scrollbar {
+  width: 6px;
+}
+
+.modalCard::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.modalCard::-webkit-scrollbar-thumb {
+  background: rgba(var(--gold-rgb), 0.7);
+  border-radius: 999px;
+}
+
+.modalCard::-webkit-scrollbar-thumb:hover {
+  background: var(--gold);
 }
 
 @keyframes slideUp {
@@ -289,10 +308,16 @@
   }
 }
 
+.modalHeader {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 8px 12px;
+  background: var(--black);
+}
+
 .modalClose {
-  position: absolute;
-  top: 16px;
-  right: 16px;
   width: 32px;
   height: 32px;
   border: 1px solid rgba(var(--gold-rgb), 0.2);
@@ -304,7 +329,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
   transition: all 0.2s ease;
 }
 
@@ -368,6 +392,24 @@
   color: rgba(240, 237, 230, 0.5); /* was #5b7fa6 */
   line-height: 1.6;
   margin: 0;
+}
+
+.openInYouTube {
+  display: inline-block;
+  margin-top: 20px;
+  padding: 10px 16px;
+  border: 1px solid rgba(var(--gold-rgb), 0.7);
+  border-radius: 6px;
+  color: var(--gold);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.openInYouTube:hover {
+  background: var(--gold);
+  color: var(--black);
 }
 
 /* ── Responsive ────────────────────────────────────────────── */
