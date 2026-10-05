@@ -62,7 +62,8 @@ export function VideosModal({ video, onClose }) {
               src={getYouTubeEmbedUrl(video.url)}
               title={video.title}
               allowFullScreen
-              allow="autoplay"
+              allow="autoplay; encrypted-media; picture-in-picture"
+              referrerPolicy="strict-origin-when-cross-origin"
             />
           ) : (
             <a href={video.url} target="_blank" rel="noopener noreferrer" className={styles.externalVideoLink}>
